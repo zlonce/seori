@@ -7,28 +7,19 @@ type ApiErrorResponse = {
   };
 };
 
-type RefreshData = {
-  accessToken: string;
-  expiresIn: number;
-};
-
 export const loginAPI = async (
   userId: string,
   password: string,
 ): Promise<
-  | { success: true; accessToken: string; refreshToken: string }
+  | { success: true; accessToken: string }
   | { success: false; error: string }
 > => {
   try {
-    const response = await client.post<{
-      accessToken: string;
-      refreshToken: string;
-    }>("/auth/login", { userId, password });
-    return {
-      success: true,
-      accessToken: response.data.accessToken,
-      refreshToken: response.data.refreshToken,
-    };
+    const response = await client.post<{ accessToken: string }>(
+      "/auth/login",
+      { userId, password },
+    );
+    return { success: true, accessToken: response.data.accessToken };
   } catch (err) {
     const error = err as AxiosError<ApiErrorResponse>;
     return {
@@ -38,49 +29,28 @@ export const loginAPI = async (
   }
 };
 
-export const logoutAPI = async (): Promise<
-  { success: true } | { success: false; error: string }
-> => {
-  try {
-    const response = await client.post<{ success: boolean }>("/auth/logout");
-    if (response.data.success) {
-      return { success: true };
-    }
-    return { success: false, error: "로그아웃에 실패했습니다" };
-  } catch (err) {
-    const error = err as AxiosError<ApiErrorResponse>;
-    return {
-      success: false,
-      error: error.response?.data?.error?.message ?? "로그아웃에 실패했습니다",
-    };
-  }
-};
-
-export const refreshTokenAPI = async (
-  refreshToken: string,
-): Promise<
-  | { success: true; accessToken: string; expiresIn: number }
+export const refreshTokenAPI = async (): Promise<
+  | { success: true; accessToken: string }
   | { success: false; error: string }
 > => {
   try {
-    const response = await client.post<{ success: boolean; data: RefreshData }>(
-      "/auth/refresh",
-      { refreshToken },
-    );
-    if (response.data.success) {
-      return {
-        success: true,
-        accessToken: response.data.data.accessToken,
-        expiresIn: response.data.data.expiresIn,
-      };
-    }
-    return { success: false, error: "토큰 갱신에 실패했습니다" };
+    // HttpOnly 쿠키가 자동으로 전송됨
+    const response = await client.post<{ accessToken: string }>("/auth/refresh");
+    return { success: true, accessToken: response.data.accessToken };
   } catch (err) {
     const error = err as AxiosError<ApiErrorResponse>;
     return {
       success: false,
       error: error.response?.data?.error?.message ?? "토큰 갱신에 실패했습니다",
     };
+  }
+};
+
+export const logoutAPI = async (): Promise<void> => {
+  try {
+    await client.post("/auth/logout");
+  } catch {
+    // 로그아웃은 실패해도 로컬 상태는 클리어
   }
 };
 

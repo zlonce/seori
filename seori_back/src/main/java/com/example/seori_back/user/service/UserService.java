@@ -7,6 +7,7 @@ import com.example.seori_back.user.dto.request.CreateUserRequestDto;
 import com.example.seori_back.user.dto.request.LoginRequestDto;
 import com.example.seori_back.user.dto.response.LoginResponseDto;
 import com.example.seori_back.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,6 @@ public class UserService {
         }
 
         String encoded = passwordEncoder.encode(userId);
-
         User user = User.create(userId, encoded, request.getPhone(), request.getRole(), request.getHourlyWage(), request.getOvertimeWage());
         userRepository.save(user);
     }
@@ -48,6 +48,25 @@ public class UserService {
         String refreshToken = jwtUtil.generateRefreshToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
 
         return new LoginResponseDto(accessToken, refreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public String refreshAccessToken(String refreshToken) {
+        try {
+            Claims claims = jwtUtil.parseToken(refreshToken);
+
+            if (!"refresh".equals(claims.get("type"))) {
+                throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다.");
+            }
+
+            String userId = claims.get("userId", String.class);
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+            return jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+        }
     }
 
     @Transactional

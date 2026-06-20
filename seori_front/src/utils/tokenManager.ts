@@ -1,50 +1,18 @@
-import { refreshTokenAPI } from "../api/auth";
+// Access token은 메모리에만 저장 (XSS 방어)
+// Refresh token은 백엔드가 HttpOnly 쿠키로 관리
 
-const ACCESS_TOKEN_KEY = "accessToken";
-const REFRESH_TOKEN_KEY = "refreshToken";
+let _accessToken: string | null = null;
 
 export const setAccessToken = (token: string): void => {
-  localStorage.setItem(ACCESS_TOKEN_KEY, token);
+  _accessToken = token;
 };
 
 export const getAccessToken = (): string | null => {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return _accessToken;
 };
 
-export const setRefreshToken = (token: string): void => {
-  localStorage.setItem(REFRESH_TOKEN_KEY, token);
-};
-
-export const getRefreshToken = (): string | null => {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-};
-
-export const saveTokens = (accessToken: string, refreshToken: string): void => {
-  setAccessToken(accessToken);
-  setRefreshToken(refreshToken);
-};
-
-export const clearTokens = (): void => {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-};
-
-export const refreshToken = async (): Promise<boolean> => {
-  const currentRefreshToken = getRefreshToken();
-
-  if (!currentRefreshToken) {
-    throw new Error("Refresh token not found");
-  }
-
-  const result = await refreshTokenAPI(currentRefreshToken);
-
-  if (result.success) {
-    setAccessToken(result.accessToken!);
-    return true;
-  }
-
-  clearTokens();
-  throw new Error(result.error);
+export const clearAccessToken = (): void => {
+  _accessToken = null;
 };
 
 export const decodeToken = (token: string): Record<string, unknown> | null => {
@@ -66,10 +34,7 @@ export const decodeToken = (token: string): Record<string, unknown> | null => {
 
 export const isTokenValid = (token: string): boolean => {
   if (!token) return false;
-
   const decoded = decodeToken(token);
   if (!decoded || typeof decoded.exp !== "number") return false;
-
-  const expirationTime = decoded.exp * 1000;
-  return Date.now() < expirationTime;
+  return Date.now() < decoded.exp * 1000;
 };

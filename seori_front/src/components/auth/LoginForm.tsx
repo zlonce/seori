@@ -48,7 +48,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
       const result = await loginAPI(userId, password);
 
       if (result.success) {
-        const user = login(result.accessToken, result.refreshToken);
+        const user = login(result.accessToken);
         if (user && onLoginSuccess) {
           onLoginSuccess(user);
         }

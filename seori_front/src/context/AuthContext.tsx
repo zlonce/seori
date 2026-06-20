@@ -7,12 +7,12 @@ import {
 } from "react";
 import {
   getAccessToken,
-  getRefreshToken,
-  isTokenValid,
+  setAccessToken,
+  clearAccessToken,
   decodeToken,
-  saveTokens,
-  clearTokens,
+  isTokenValid,
 } from "../utils/tokenManager";
+import { refreshTokenAPI, logoutAPI } from "../api/auth";
 
 export type User = {
   userId: string;
@@ -24,7 +24,7 @@ type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (accessToken: string, refreshToken: string) => User | null;
+  login: (accessToken: string) => User | null;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
 };
@@ -51,20 +51,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       const accessToken = getAccessToken();
-      const refreshToken = getRefreshToken();
 
       if (accessToken && isTokenValid(accessToken)) {
+        // 같은 세션에서 메모리 토큰이 살아있는 경우
         const parsed = buildUserFromToken(accessToken);
         if (parsed) {
           setUser(parsed);
           setIsAuthenticated(true);
+          setIsLoading(false);
+          return;
         }
-      } else if (refreshToken) {
-        setIsAuthenticated(false);
-      } else {
-        setIsAuthenticated(false);
+      }
+
+      // 새로고침 등으로 메모리가 초기화된 경우 → HttpOnly 쿠키로 재발급
+      const result = await refreshTokenAPI();
+      if (result.success) {
+        setAccessToken(result.accessToken);
+        const parsed = buildUserFromToken(result.accessToken);
+        if (parsed) {
+          setUser(parsed);
+          setIsAuthenticated(true);
+        }
       }
 
       setIsLoading(false);
@@ -73,21 +82,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initializeAuth();
   }, []);
 
-  const login = useCallback(
-    (accessToken: string, refreshToken: string): User | null => {
-      saveTokens(accessToken, refreshToken);
-      const parsed = buildUserFromToken(accessToken);
-      if (parsed) {
-        setUser(parsed);
-        setIsAuthenticated(true);
-      }
-      return parsed;
-    },
-    [],
-  );
+  const login = useCallback((accessToken: string): User | null => {
+    setAccessToken(accessToken);
+    const parsed = buildUserFromToken(accessToken);
+    if (parsed) {
+      setUser(parsed);
+      setIsAuthenticated(true);
+    }
+    return parsed;
+  }, []);
 
   const logout = useCallback(() => {
-    clearTokens();
+    logoutAPI(); // 백엔드 쿠키 삭제 (fire-and-forget)
+    clearAccessToken();
     setUser(null);
     setIsAuthenticated(false);
   }, []);
