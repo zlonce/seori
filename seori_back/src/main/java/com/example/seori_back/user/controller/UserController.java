@@ -52,8 +52,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        String newAccessToken = userService.refreshAccessToken(refreshToken);
-        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        try {
+			String newAccessToken = userService.refreshAccessToken(refreshToken);
+            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping("/auth/logout")
