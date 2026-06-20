@@ -23,14 +23,13 @@ public class UserService {
     @Transactional
     public void createUser(CreateUserRequestDto request) {
         String phone = request.getPhone().replaceAll("[^0-9]", "");
-        Long userId = Long.parseLong(phone.substring(phone.length() - 4));
+        String userId = phone.substring(phone.length() - 4);
 
         if (userRepository.existsById(userId)) {
             throw new IllegalArgumentException("이미 등록된 전화번호 뒷자리입니다: " + userId);
         }
 
-        String initialPassword = String.valueOf(userId);
-        String encoded = passwordEncoder.encode(initialPassword);
+        String encoded = passwordEncoder.encode(userId);
 
         User user = User.create(userId, encoded, request.getPhone(), request.getRole(), request.getHourlyWage(), request.getOvertimeWage());
         userRepository.save(user);
@@ -52,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(Long userId, ChangePasswordRequestDto request) {
+    public void changePassword(String userId, ChangePasswordRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 

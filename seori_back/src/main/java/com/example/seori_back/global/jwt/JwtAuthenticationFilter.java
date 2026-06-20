@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Long userId = claims.get("userId", Long.class);
+            String userId = claims.get("userId", String.class);
             String role = claims.get("role", String.class);
 
             request.setAttribute("userId", userId);
@@ -49,7 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (JwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
+            SecurityContextHolder.clearContext();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다.");
             return;
         }

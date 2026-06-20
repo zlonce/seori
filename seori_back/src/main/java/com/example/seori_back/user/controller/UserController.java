@@ -5,7 +5,6 @@ import com.example.seori_back.user.dto.request.CreateUserRequestDto;
 import com.example.seori_back.user.dto.request.LoginRequestDto;
 import com.example.seori_back.user.dto.response.LoginResponseDto;
 import com.example.seori_back.user.service.UserService;
-import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,7 @@ public class UserController {
 
     @PatchMapping("/users/password")
     public ResponseEntity<Void> changePassword(
-            @RequestAttribute("userId") Long userId,
+            @RequestAttribute String userId,
             @RequestBody @Valid ChangePasswordRequestDto request) {
         userService.changePassword(userId, request);
         return ResponseEntity.ok().build();

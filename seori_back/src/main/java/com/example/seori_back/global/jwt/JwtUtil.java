@@ -25,15 +25,15 @@ public class JwtUtil {
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateAccessToken(String username, long userId, String role) {
+    public String generateAccessToken(String username, String userId, String role) {
         return createToken(username, userId, role, jwtProperties.getAccess().getExpiration(), "access");
     }
 
-    public String generateRefreshToken(String username, long userId, String role) {
+    public String generateRefreshToken(String username, String userId, String role) {
         return createToken(username, userId, role, jwtProperties.getRefresh().getExpiration(), "refresh");
     }
 
-    private String createToken(String username, long userId, String role, long expiration, String type) {
+    private String createToken(String username, String userId, String role, long expiration, String type) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
 
