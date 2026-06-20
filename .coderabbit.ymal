@@ -1,0 +1,4 @@
+language: ko 
+
+review:
+  enabled: true
