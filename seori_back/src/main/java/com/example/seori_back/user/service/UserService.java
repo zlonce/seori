@@ -1,0 +1,83 @@
+package com.example.seori_back.user.service;
+
+import com.example.seori_back.global.jwt.JwtUtil;
+import com.example.seori_back.user.domain.entity.User;
+import com.example.seori_back.user.dto.request.ChangePasswordRequestDto;
+import com.example.seori_back.user.dto.request.CreateUserRequestDto;
+import com.example.seori_back.user.dto.request.LoginRequestDto;
+import com.example.seori_back.user.dto.response.LoginResponseDto;
+import com.example.seori_back.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
+    @Transactional
+    public void createUser(CreateUserRequestDto request) {
+        String phone = request.getPhone().replaceAll("[^0-9]", "");
+        String userId = phone.substring(phone.length() - 4);
+
+        if (userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("이미 등록된 전화번호 뒷자리입니다: " + userId);
+        }
+
+        String encoded = passwordEncoder.encode(userId);
+        User user = User.create(userId, encoded, request.getPhone(), request.getRole(), request.getHourlyWage(), request.getOvertimeWage());
+        userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public LoginResponseDto login(LoginRequestDto request) {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        }
+
+        String accessToken = jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
+
+        return new LoginResponseDto(accessToken, refreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public String refreshAccessToken(String refreshToken) {
+        try {
+            Claims claims = jwtUtil.parseToken(refreshToken);
+
+            if (!"refresh".equals(claims.get("type"))) {
+                throw new IllegalArgumentException("유효하지 않은 토큰 타입입니다.");
+            }
+
+            String userId = claims.get("userId", String.class);
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+            return jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+        }
+    }
+
+    @Transactional
+    public void changePassword(String userId, ChangePasswordRequestDto request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다.");
+        }
+
+        user.changePassword(passwordEncoder.encode(request.getNewPassword()));
+    }
+}
