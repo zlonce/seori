@@ -52,9 +52,10 @@ export default function WageSummary({ records, onRefresh }: Props) {
           <p className={styles.empty}>이번 달 근무 기록이 없습니다.</p>
         )}
         {completed.map((r) => (
-          <div
+          <button
             key={r.id}
             className={styles.card}
+            type="button"
             onClick={() => setModalRecord(r)}
           >
             <div className={styles.cardLeft}>
@@ -74,7 +75,7 @@ export default function WageSummary({ records, onRefresh }: Props) {
                 </span>
               )}
             </div>
-          </div>
+          </button>
         ))}
       </div>
 

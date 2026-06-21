@@ -10,6 +10,9 @@ export interface SpecialDayResponse {
 export const getSpecialDaysAPI = (year: number, month: number) =>
   client.get<SpecialDayResponse[]>("/special-days", { params: { year, month } }).then((r) => r.data);
 
+export const getAllSpecialDaysAPI = () =>
+  client.get<SpecialDayResponse[]>("/special-days/all").then((r) => r.data);
+
 export const createSpecialDayAPI = (date: string, name: string, recurring: boolean) =>
   client.post<SpecialDayResponse>("/special-days", { date, name, recurring }).then((r) => r.data);
 
