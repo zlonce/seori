@@ -1,0 +1,19 @@
+# 리뷰 언어 설정
+language: "ko-KR"
+
+review:
+  enabled: true
+
+# 리뷰 대상 제외 (노이즈 제거)
+  path_filters:
+    - "!**/build/**"
+    - "!**/.gradle/**"
+    - "!**/generated/**"
+    - "!**/*.md"
+    - "!**/docs/**"
+    - "!**/.idea/**"
+    - "!**/*.iml"
+    - "!**/reports/**"
+
+  
+       
