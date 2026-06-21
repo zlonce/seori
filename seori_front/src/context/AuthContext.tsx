@@ -5,6 +5,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+
 import {
   getAccessToken,
   setAccessToken,
@@ -93,7 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = useCallback(() => {
-    logoutAPI(); // 백엔드 쿠키 삭제 (fire-and-forget)
+    logoutAPI(); // 백엔드 쿠키 삭제
     clearAccessToken();
     setUser(null);
     setIsAuthenticated(false);
