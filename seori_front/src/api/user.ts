@@ -21,7 +21,7 @@ export const updateStaffProfileAPI = (userId: string, data: { name: string; role
 export const createUserAPI = (data: {
   phone: string;
   name: string;
-  role: string;
+  role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
   weeklyWorkDays: number;

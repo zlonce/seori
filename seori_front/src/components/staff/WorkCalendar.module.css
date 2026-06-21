@@ -41,6 +41,10 @@
   gap: 4px;
   cursor: pointer;
   border: 1px solid #f0f0f0;
+  background: none;
+  font: inherit;
+  text-align: inherit;
+  width: 100%;
 }
 
 .dayNum {

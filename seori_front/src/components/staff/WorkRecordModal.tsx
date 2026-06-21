@@ -14,8 +14,16 @@ interface Props {
 const DEFAULT_START = "18:30";
 const DEFAULT_END = "22:00";
 
-export default function WorkRecordModal({ date, record, onClose, onSaved, onDelete }: Props) {
-  const [startTime, setStartTime] = useState(record?.startTime ?? DEFAULT_START);
+export default function WorkRecordModal({
+  date,
+  record,
+  onClose,
+  onSaved,
+  onDelete,
+}: Props) {
+  const [startTime, setStartTime] = useState(
+    record?.startTime ?? DEFAULT_START,
+  );
   const [endTime, setEndTime] = useState(record?.endTime ?? DEFAULT_END);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,6 +43,10 @@ export default function WorkRecordModal({ date, record, onClose, onSaved, onDele
   };
 
   const handleSave = async () => {
+    if (startTime >= endTime) {
+      setError("퇴근 시간은 출근 시간보다 늦어야 합니다.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -58,8 +70,22 @@ export default function WorkRecordModal({ date, record, onClose, onSaved, onDele
         <div className={styles.titleRow}>
           <h3 className={styles.title}>{date} 근무 기록</h3>
           {record && onDelete && (
-            <button className={styles.deleteBtn} onClick={handleDelete} disabled={loading} title="삭제">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <button
+              className={styles.deleteBtn}
+              onClick={handleDelete}
+              disabled={loading}
+              title="삭제"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                 <path d="M10 11v6M14 11v6" />
@@ -71,21 +97,47 @@ export default function WorkRecordModal({ date, record, onClose, onSaved, onDele
 
         <div className={styles.timeRow}>
           <div className={styles.field}>
-            <label className={styles.label}>출근</label>
-            <input className={styles.input} type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            <label className={styles.label} htmlFor="work-start-time">
+              출근
+            </label>
+            <input
+              id="work-start-time"
+              className={styles.input}
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
           </div>
           <span className={styles.dash}>~</span>
           <div className={styles.field}>
-            <label className={styles.label}>퇴근</label>
-            <input className={styles.input} type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            <label className={styles.label} htmlFor="work-end-time">
+              퇴근
+            </label>
+            <input
+              id="work-end-time"
+              className={styles.input}
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
           </div>
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
 
         <div className={styles.buttons}>
-          <button className={styles.cancelBtn} onClick={onClose} disabled={loading}>취소</button>
-          <button className={styles.saveBtn} onClick={handleSave} disabled={loading}>
+          <button
+            className={styles.cancelBtn}
+            onClick={onClose}
+            disabled={loading}
+          >
+            취소
+          </button>
+          <button
+            className={styles.saveBtn}
+            onClick={handleSave}
+            disabled={loading}
+          >
             {loading ? "저장 중..." : "저장"}
           </button>
         </div>

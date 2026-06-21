@@ -32,7 +32,7 @@ export default function WorkCalendar({
   const [editRecord, setEditRecord] = useState<WorkRecordResponse | undefined>(
     undefined,
   );
-  const [pastError, setPastError] = useState(false);
+  const [toast, setToast] = useState("");
 
   const recordMap = new Map<string, WorkRecordResponse>();
   records.forEach((r) => recordMap.set(r.workDate, r));
@@ -61,8 +61,8 @@ export default function WorkCalendar({
     }
 
     if (dateStr > todayStr) {
-      setPastError(true);
-      setTimeout(() => setPastError(false), 2500);
+      setToast("미래 날짜에는 근무 기록을 추가할 수 없습니다.");
+      setTimeout(() => setToast(""), 2500);
       return;
     }
 
@@ -76,14 +76,19 @@ export default function WorkCalendar({
   ) => {
     e.stopPropagation();
     if (!confirm("삭제하시겠습니까?")) return;
-    await deleteWorkRecordAPI(record.id);
-    onRefresh();
+    try {
+      await deleteWorkRecordAPI(record.id);
+      onRefresh();
+    } catch {
+      setToast("삭제에 실패했습니다.");
+      setTimeout(() => setToast(""), 2500);
+    }
   };
 
   return (
     <div>
-      {pastError && (
-        <div className={styles.errorToast}>근무 기록을 추가할 수 없습니다.</div>
+      {toast && (
+        <div className={styles.errorToast}>{toast}</div>
       )}
 
       <div className={styles.dayHeader}>
@@ -113,7 +118,7 @@ export default function WorkCalendar({
           const isSat = idx % 7 === 6;
 
           return (
-            <div
+            <button
               key={idx}
               className={styles.cell}
               style={{
@@ -150,7 +155,7 @@ export default function WorkCalendar({
               >
                 {day}
               </span>
-            </div>
+            </button>
           );
         })}
       </div>
