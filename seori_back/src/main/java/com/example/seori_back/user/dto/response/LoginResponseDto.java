@@ -1,11 +1,6 @@
 package com.example.seori_back.user.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
-public class LoginResponseDto {
-    private String accessToken;
-    private String refreshToken;
-}
+public record LoginResponseDto(
+        String accessToken,
+        String refreshToken
+) {}
