@@ -7,6 +7,7 @@ import com.example.seori_back.specialday.dto.request.CreateSpecialDayRequestDto;
 import com.example.seori_back.specialday.dto.response.SpecialDayResponseDto;
 import com.example.seori_back.specialday.repository.SpecialDayRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +41,13 @@ public class SpecialDayService {
         if (specialDayRepository.existsByDate(request.date())) {
             throw new CustomException(ErrorCode.DUPLICATE_SPECIAL_DAY);
         }
-        SpecialDay specialDay = SpecialDay.create(request.date(), request.name(), request.recurring());
-        specialDayRepository.save(specialDay);
-        return SpecialDayResponseDto.from(specialDay);
+        try {
+            SpecialDay specialDay = SpecialDay.create(request.date(), request.name(), request.recurring());
+            specialDayRepository.save(specialDay);
+            return SpecialDayResponseDto.from(specialDay);
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(ErrorCode.DUPLICATE_SPECIAL_DAY);
+        }
     }
 
     @Transactional
