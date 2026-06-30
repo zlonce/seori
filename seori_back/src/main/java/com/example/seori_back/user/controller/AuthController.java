@@ -1,5 +1,7 @@
 package com.example.seori_back.user.controller;
 
+import com.example.seori_back.global.exception.CustomException;
+import com.example.seori_back.global.exception.ErrorCode;
 import com.example.seori_back.user.dto.request.LoginRequestDto;
 import com.example.seori_back.user.dto.response.LoginResponseDto;
 import com.example.seori_back.user.service.UserService;
@@ -8,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,15 +48,11 @@ public class AuthController {
             @CookieValue(name = "refreshToken", required = false) String refreshToken) {
 
         if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        try {
-			String newAccessToken = userService.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        String newAccessToken = userService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
 
     @PostMapping("/logout")
