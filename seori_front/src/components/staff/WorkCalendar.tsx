@@ -15,11 +15,7 @@ interface Props {
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-const STATUS_COLOR = {
-  COMPLETED: "#2196F3",
-  INCOMPLETE: "#FF9800",
-  SCHEDULED: "#4CAF50",
-} as const;
+const RECORD_COLOR = "#2196F3";
 
 export default function WorkCalendar({
   year,
@@ -149,9 +145,7 @@ export default function WorkCalendar({
                           ? "#1976D2"
                           : "#1a1a1a",
                   fontWeight: isSpecial || record ? 700 : 400,
-                  background: record
-                    ? STATUS_COLOR[record.status] + "CC"
-                    : "transparent",
+                  background: record ? RECORD_COLOR + "CC" : "transparent",
                 }}
               >
                 {day}
@@ -162,18 +156,10 @@ export default function WorkCalendar({
       </div>
 
       <div className={styles.legend}>
-        {Object.entries(STATUS_COLOR).map(([status, color]) => (
-          <div key={status} className={styles.legendItem}>
-            <div className={styles.legendDot} style={{ background: color }} />
-            <span>
-              {status === "COMPLETED"
-                ? "근무완료"
-                : status === "INCOMPLETE"
-                  ? "시간미입력"
-                  : "예정"}
-            </span>
-          </div>
-        ))}
+        <div className={styles.legendItem}>
+          <div className={styles.legendDot} style={{ background: RECORD_COLOR }} />
+          <span>근무완료</span>
+        </div>
         <div className={styles.legendItem}>
           <span className={styles.legendSpecial}>날짜</span>
           <span>&nbsp;= 추가수당일</span>

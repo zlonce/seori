@@ -1,13 +1,10 @@
 import client from "./client";
 
-export type WorkStatus = "SCHEDULED" | "COMPLETED" | "INCOMPLETE";
-
 export interface WorkRecordResponse {
   id: number;
   workDate: string;
-  startTime: string | null;
-  endTime: string | null;
-  status: WorkStatus;
+  startTime: string;
+  endTime: string;
   specialDay: boolean;
   regularMinutes: number;
   overtimeMinutes: number;
@@ -18,13 +15,13 @@ export interface WorkRecordResponse {
 
 export interface CreateWorkRecordRequest {
   workDate: string;
-  startTime: string | null;
-  endTime: string | null;
+  startTime: string;
+  endTime: string;
 }
 
 export interface UpdateWorkRecordRequest {
-  startTime: string | null;
-  endTime: string | null;
+  startTime: string;
+  endTime: string;
 }
 
 export const getMyWorkRecordsAPI = (year: number, month: number) =>

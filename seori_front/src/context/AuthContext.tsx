@@ -18,7 +18,7 @@ import { refreshTokenAPI, logoutAPI } from "../api/auth";
 export type User = {
   userId: string;
   phone: string;
-  role: "ROLE_OWNER" | "ROLE_STAFF";
+  role: "ROLE_OWNER" | "ROLE_MANAGER" | "ROLE_STAFF";
 };
 
 type AuthContextType = {

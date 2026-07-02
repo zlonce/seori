@@ -13,5 +13,5 @@ public record CreateUserRequestDto(
         @NotNull UserRoleEnum role,
         @Positive int hourlyWage,
         @Positive int overtimeWage,
-        @Min(1) @Max(2) int weeklyWorkDays
+        @Min(1) @Max(5) int weeklyWorkDays
 ) {}

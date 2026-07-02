@@ -13,17 +13,9 @@ export default function WageSummary({ records, onRefresh }: Props) {
   const [modalRecord, setModalRecord] = useState<WorkRecordResponse | null>(
     null,
   );
-  const completed = records.filter((r) => r.status === "COMPLETED");
-
-  const totalRegularMinutes = completed.reduce(
-    (s, r) => s + r.regularMinutes,
-    0,
-  );
-  const totalOvertimeMinutes = completed.reduce(
-    (s, r) => s + r.overtimeMinutes,
-    0,
-  );
-  const totalWage = completed.reduce((s, r) => s + r.totalWage, 0);
+  const totalRegularMinutes = records.reduce((s, r) => s + r.regularMinutes, 0);
+  const totalOvertimeMinutes = records.reduce((s, r) => s + r.overtimeMinutes, 0);
+  const totalWage = records.reduce((s, r) => s + r.totalWage, 0);
 
   const fmt = (min: number) => `${Math.floor(min / 60)}H ${min % 60}M`;
   const fmtWage = (w: number) => w.toLocaleString("ko-KR") + "원";
@@ -48,10 +40,10 @@ export default function WageSummary({ records, onRefresh }: Props) {
       </div>
 
       <div className={styles.list}>
-        {completed.length === 0 && (
+        {records.length === 0 && (
           <p className={styles.empty}>이번 달 근무 기록이 없습니다.</p>
         )}
-        {completed.map((r) => (
+        {records.map((r) => (
           <button
             key={r.id}
             className={styles.card}
