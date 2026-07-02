@@ -5,7 +5,7 @@ import {
   createUserAPI,
 } from "../../api/user";
 import {
-  getAllSpecialDaysAPI,
+  getActiveSpecialDaysAPI,
   createSpecialDayAPI,
   deleteSpecialDayAPI,
 } from "../../api/specialDay";
@@ -82,14 +82,8 @@ export default function OwnerDashboard() {
       .then(setStaffList)
       .catch(() => {});
   const fetchSpecial = () =>
-    getAllSpecialDaysAPI()
-      .then((data) => {
-        const currentYear = now.getFullYear();
-        const filtered = data.filter(
-          (d) => d.recurring || new Date(d.date).getFullYear() >= currentYear,
-        );
-        setSpecialDays(sortByCurrentMonth(filtered));
-      })
+    getActiveSpecialDaysAPI(now.getFullYear())
+      .then((data) => setSpecialDays(sortByCurrentMonth(data)))
       .catch(() => {});
 
   const fetchWages = async (list: StaffSummary[]) => {
@@ -101,14 +95,13 @@ export default function OwnerDashboard() {
       );
       setWageData(
         list.map((s, i) => {
-          const completed = records[i].filter((r) => r.status === "COMPLETED");
           return {
             userId: s.userId,
             name: s.name,
             role: s.role,
-            regularWage: completed.reduce((sum, r) => sum + r.regularWage, 0),
-            overtimeWage: completed.reduce((sum, r) => sum + r.overtimeWage, 0),
-            totalWage: completed.reduce((sum, r) => sum + r.totalWage, 0),
+            regularWage: records[i].reduce((sum, r) => sum + r.regularWage, 0),
+            overtimeWage: records[i].reduce((sum, r) => sum + r.overtimeWage, 0),
+            totalWage: records[i].reduce((sum, r) => sum + r.totalWage, 0),
           };
         }),
       );

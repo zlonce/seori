@@ -6,31 +6,38 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class JwtUtil {
 
-    private final JwtProperties jwtProperties;
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.access.expiration}")
+    private long accessExpiration;
+
+    @Value("${jwt.refresh.expiration}")
+    private long refreshExpiration;
+
     private Key signingKey;
 
     @PostConstruct
     public void init() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecret());
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateAccessToken(String username, String userId, String role) {
-        return createToken(username, userId, role, jwtProperties.getAccess().getExpiration(), "access");
+        return createToken(username, userId, role, accessExpiration, "access");
     }
 
     public String generateRefreshToken(String username, String userId, String role) {
-        return createToken(username, userId, role, jwtProperties.getRefresh().getExpiration(), "refresh");
+        return createToken(username, userId, role, refreshExpiration, "refresh");
     }
 
     private String createToken(String username, String userId, String role, long expiration, String type) {

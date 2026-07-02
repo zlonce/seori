@@ -1,90 +1,61 @@
 package com.example.seori_back.user.controller;
 
-import com.example.seori_back.user.dto.request.ChangePasswordRequestDto;
-import com.example.seori_back.user.dto.request.CreateUserRequestDto;
-import com.example.seori_back.user.dto.request.LoginRequestDto;
-import com.example.seori_back.user.dto.response.LoginResponseDto;
-import com.example.seori_back.user.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Duration;
-import java.util.Map;
+import com.example.seori_back.user.dto.request.ChangePasswordRequestDto;
+import com.example.seori_back.user.dto.request.CreateUserRequestDto;
+import com.example.seori_back.user.dto.request.UpdateStaffRequestDto;
+import com.example.seori_back.user.dto.response.StaffSummaryResponseDto;
+import com.example.seori_back.user.service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+	private final UserService userService;
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<Map<String, String>> login(
-            @RequestBody @Valid LoginRequestDto request,
-            HttpServletResponse response) {
+	@PostMapping()
+	@PreAuthorize("hasRole('OWNER')")
+	public ResponseEntity<Void> createUser(@RequestBody @Valid CreateUserRequestDto request) {
+		userService.createUser(request);
+		return ResponseEntity.ok().build();
+	}
 
-        LoginResponseDto tokens = userService.login(request);
+	@GetMapping("/staff")
+	@PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
+	public ResponseEntity<List<StaffSummaryResponseDto>> getStaffList() {
+		return ResponseEntity.ok(userService.getStaffList());
+	}
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.getRefreshToken())
-                .httpOnly(true)
-                .secure(false) // 운영 환경에서는 true (HTTPS)
-                .sameSite("Lax")
-                .path("/api/auth")
-                .maxAge(Duration.ofDays(7))
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+	@PatchMapping("/{userId}/profile")
+	@PreAuthorize("hasRole('OWNER')")
+	public ResponseEntity<Void> updateStaff(
+		@PathVariable String userId,
+		@RequestBody @Valid UpdateStaffRequestDto request) {
+		userService.updateStaff(userId, request);
+		return ResponseEntity.ok().build();
+	}
 
-        return ResponseEntity.ok(Map.of("accessToken", tokens.getAccessToken()));
-    }
-
-    @PostMapping("/auth/refresh")
-    public ResponseEntity<Map<String, String>> refresh(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken) {
-
-        if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        try {
-			String newAccessToken = userService.refreshAccessToken(refreshToken);
-            return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
-    @PostMapping("/auth/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
-        ResponseCookie clearCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
-                .path("/api/auth")
-                .maxAge(Duration.ofSeconds(0))
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, clearCookie.toString());
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/users")
-    @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<Void> createUser(@RequestBody @Valid CreateUserRequestDto request) {
-        userService.createUser(request);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/users/password")
-    public ResponseEntity<Void> changePassword(
-            @RequestAttribute String userId,
-            @RequestBody @Valid ChangePasswordRequestDto request) {
-        userService.changePassword(userId, request);
-        return ResponseEntity.ok().build();
-    }
+	@PatchMapping("/password")
+	public ResponseEntity<Void> changePassword(
+		@RequestAttribute String userId,
+		@RequestBody @Valid ChangePasswordRequestDto request) {
+		userService.changePassword(userId, request);
+		return ResponseEntity.ok().build();
+	}
 }

@@ -55,15 +55,12 @@ export const logoutAPI = async (): Promise<void> => {
 };
 
 export const changePasswordAPI = async (
-  oldPassword: string,
+  currentPassword: string,
   newPassword: string,
-): Promise<{ success: boolean; data?: unknown; error?: string }> => {
+): Promise<{ success: boolean; error?: string }> => {
   try {
-    const response = await client.put<{ success: boolean; data: unknown }>(
-      "/auth/change-password",
-      { oldPassword, newPassword },
-    );
-    return { success: response.data.success, data: response.data.data };
+    await client.patch("/users/password", { currentPassword, newPassword });
+    return { success: true };
   } catch (err) {
     const error = err as AxiosError<ApiErrorResponse>;
     return {

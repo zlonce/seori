@@ -25,24 +25,40 @@ public class User {
     @Column(nullable = false)
     private UserRoleEnum role;
 
+    @Column(nullable = false, length = 20)
+    private String name;
+
     @Column(nullable = false)
     private int hourlyWage;
 
     @Column(nullable = false)
     private int overtimeWage;
 
-    public static User create(String userId, String encodedPassword, String phone, UserRoleEnum role, int hourlyWage, int overtimeWage) {
+    @Column(nullable = false)
+    private int weeklyWorkDays;
+
+    public static User create(String userId, String encodedPassword, String phone, String name, UserRoleEnum role, int hourlyWage, int overtimeWage, int weeklyWorkDays) {
         User user = new User();
         user.userId = userId;
         user.password = encodedPassword;
         user.phone = phone;
+        user.name = name;
         user.role = role;
         user.hourlyWage = hourlyWage;
         user.overtimeWage = overtimeWage;
+        user.weeklyWorkDays = weeklyWorkDays;
         return user;
     }
 
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updateProfile(String name, UserRoleEnum role, int hourlyWage, int overtimeWage, int weeklyWorkDays) {
+        this.name = name;
+        this.role = role;
+        this.hourlyWage = hourlyWage;
+        this.overtimeWage = overtimeWage;
+        this.weeklyWorkDays = weeklyWorkDays;
     }
 }
