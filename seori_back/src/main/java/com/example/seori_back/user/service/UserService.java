@@ -31,6 +31,9 @@ public class UserService {
     @Transactional
     public void createUser(CreateUserRequestDto request) {
         String phone = request.phone().replaceAll("[^0-9]", "");
+        if(phone.length() < 11){
+            throw new CustomException(ErrorCode.INVALID_PHONE_NUMBER);
+        }
         String userId = phone.substring(phone.length() - 4);
 
         if (userRepository.existsById(userId)) {
