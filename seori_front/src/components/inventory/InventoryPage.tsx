@@ -44,10 +44,6 @@ const sortByQuantity = (items: InventoryItem[]) =>
   });
 
 export default function InventoryPage() {
-  const { user } = useAuth();
-  const canEdit =
-    user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
-
   const [sections, setSections] = useState<InventorySection[]>(DUMMY_DATA);
   const [isEditMode, setIsEditMode] = useState(false);
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -74,11 +70,11 @@ export default function InventoryPage() {
             ? {
                 ...s,
                 items: s.items.map((item) =>
-                  item.id === itemId ? { ...item, quantity: qty } : item
+                  item.id === itemId ? { ...item, quantity: qty } : item,
                 ),
               }
-            : s
-        )
+            : s,
+        ),
       );
     }
     setEditingId(null);
@@ -89,8 +85,8 @@ export default function InventoryPage() {
       prev.map((s) =>
         s.id === sectionId
           ? { ...s, items: s.items.filter((item) => item.id !== itemId) }
-          : s
-      )
+          : s,
+      ),
     );
   };
 
@@ -111,8 +107,8 @@ export default function InventoryPage() {
                 },
               ],
             }
-          : s
-      )
+          : s,
+      ),
     );
     setNewName("");
     setNewQty("1");
@@ -173,9 +169,12 @@ export default function InventoryPage() {
                             placeholder={String(item.quantity)}
                             value={editingQty}
                             onChange={(e) => setEditingQty(e.target.value)}
-                            onBlur={() => commitQty(section.id, item.id, item.quantity)}
+                            onBlur={() =>
+                              commitQty(section.id, item.id, item.quantity)
+                            }
                             onKeyDown={(e) =>
-                              e.key === "Enter" && commitQty(section.id, item.id, item.quantity)
+                              e.key === "Enter" &&
+                              commitQty(section.id, item.id, item.quantity)
                             }
                             autoFocus
                           />
