@@ -43,7 +43,7 @@ public class UserController {
 	}
 
 	@PatchMapping("/{userId}/profile")
-	@PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
+	@PreAuthorize("hasRole('OWNER')")
 	public ResponseEntity<Void> updateStaff(
 		@PathVariable String userId,
 		@RequestBody @Valid UpdateStaffRequestDto request) {
