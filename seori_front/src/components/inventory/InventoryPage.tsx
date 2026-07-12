@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   getSectionsAPI,
@@ -31,6 +31,7 @@ export default function InventoryPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [newSectionLabel, setNewSectionLabel] = useState("");
+  const qtyInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getSectionsAPI()
@@ -255,10 +256,17 @@ export default function InventoryPage() {
                             onBlur={() =>
                               commitQty(section.id, item.id, item.quantity)
                             }
-                            onKeyDown={(e) =>
-                              e.key === "Enter" &&
-                              commitQty(section.id, item.id, item.quantity)
-                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                commitQty(section.id, item.id, item.quantity);
+                                const idx = sorted.findIndex((i) => i.id === item.id);
+                                const next = sorted[idx + 1];
+                                if (next) {
+                                  setEditingId(next.id);
+                                  setEditingQty("");
+                                }
+                              }
+                            }}
                             autoFocus
                           />
                         ) : (
@@ -291,12 +299,13 @@ export default function InventoryPage() {
                           placeholder="품목명"
                           value={newName}
                           onChange={(e) => setNewName(e.target.value)}
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && handleAdd(section.id)
-                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") qtyInputRef.current?.focus();
+                          }}
                           autoFocus
                         />
                         <input
+                          ref={qtyInputRef}
                           className={styles.qtyInput}
                           type="number"
                           min="0"
