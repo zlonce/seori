@@ -164,7 +164,7 @@ export default function InventoryPage() {
 
       {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
 
-      {sections.length === 0 && (
+      {sections.length === 0 && !isEditMode && (
         <p className={styles.empty}>등록된 재고 섹션이 없습니다.</p>
       )}
 
