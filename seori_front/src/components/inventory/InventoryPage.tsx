@@ -302,6 +302,9 @@ export default function InventoryPage() {
                           min="0"
                           value={newQty}
                           onChange={(e) => setNewQty(e.target.value)}
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && handleAdd(section.id)
+                          }
                         />
                         <div className={styles.formBtns}>
                           <button
