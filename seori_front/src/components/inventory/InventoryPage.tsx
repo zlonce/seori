@@ -288,12 +288,30 @@ export default function InventoryPage() {
                   </button>
                 )}
                 {isEditMode && (
-                  <button
-                    className={styles.sectionDeleteBtn}
-                    onClick={() => handleDeleteSection(section.id)}
-                  >
-                    삭제
-                  </button>
+                  confirmDeleteId === section.id ? (
+                    <div className={styles.deleteConfirm}>
+                      <span className={styles.deleteConfirmText}>삭제할까요?</span>
+                      <button
+                        className={styles.deleteCancelBtn}
+                        onClick={() => setConfirmDeleteId(null)}
+                      >
+                        취소
+                      </button>
+                      <button
+                        className={styles.deleteConfirmBtn}
+                        onClick={() => handleDeleteSection(section.id)}
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className={styles.sectionDeleteBtn}
+                      onClick={() => setConfirmDeleteId(section.id)}
+                    >
+                      삭제
+                    </button>
+                  )
                 )}
               </div>
             </div>
