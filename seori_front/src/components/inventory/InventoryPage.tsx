@@ -180,6 +180,10 @@ export default function InventoryPage() {
     setIsEditMode((v) => !v);
     setIsAddingSection(false);
     setNewSectionLabel("");
+    setEditingSectionId(null);
+    setPendingQty({});
+    setAddingSection(null);
+    setConfirmDeleteId(null);
   };
 
   if (loading) {
