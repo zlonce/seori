@@ -60,6 +60,34 @@
   background: #fafafa;
 }
 
+.sectionHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 4px;
+  flex-shrink: 0;
+}
+
+.sectionQtyEditBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #555;
+}
+
+.sectionQtyEditBtn:hover {
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+.sectionQtyEditBtnActive {
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
 .sectionDeleteBtn {
   background: none;
   border: none;
@@ -111,21 +139,16 @@
   gap: 12px;
 }
 
-.qtyBtn {
+.qtyText {
   background: #f5f5f5;
-  border: none;
   border-radius: 6px;
   padding: 5px 18px;
   font-size: 16px;
   font-weight: 600;
-  cursor: pointer;
   min-width: 48px;
   color: #333;
   text-align: center;
-}
-
-.qtyBtn:hover {
-  background: #e8e8e8;
+  display: inline-block;
 }
 
 .qtyEditInput {
@@ -139,6 +162,11 @@
   outline: none;
 }
 
+.qtyEditInput::placeholder {
+  color: #bbb;
+  font-weight: 400;
+}
+
 .deleteBtn {
   background: none;
   border: none;
@@ -150,6 +178,38 @@
 
 .deleteBtn:hover {
   color: #e74c3c;
+}
+
+.deleteConfirm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deleteConfirmText {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.deleteCancelBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #888;
+}
+
+.deleteConfirmBtn {
+  background: #e74c3c;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #fff;
 }
 
 .addItemBtn {
