@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import {
   getSectionsAPI,
@@ -9,6 +9,7 @@ import {
   deleteSectionAPI,
 } from "../../api/inventory";
 import type { InventorySection, InventoryItem } from "../../api/inventory";
+import { useAuth } from "../../hooks/useAuth";
 import styles from "./InventoryPage.module.css";
 
 const sortByQuantity = (items: InventoryItem[]) =>
@@ -19,18 +20,30 @@ const sortByQuantity = (items: InventoryItem[]) =>
   });
 
 export default function InventoryPage() {
+  const { user } = useAuth();
+  const isManagerOrAbove =
+    user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
+
   const [sections, setSections] = useState<InventorySection[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // owner/manager 전용: 섹션 추가·삭제 모드
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isAddingSection, setIsAddingSection] = useState(false);
+  const [newSectionLabel, setNewSectionLabel] = useState("");
+
   const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingQty, setEditingQty] = useState("");
+
+  // 섹션별 수정 모드: 수량 수정 + 아이템 추가·삭제
+  const [editingSectionId, setEditingSectionId] = useState<number | null>(null);
+  const [pendingQty, setPendingQty] = useState<Record<number, string>>({});
   const [addingSection, setAddingSection] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
   const [newQty, setNewQty] = useState("1");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isAddingSection, setIsAddingSection] = useState(false);
-  const [newSectionLabel, setNewSectionLabel] = useState("");
+  const qtyInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     getSectionsAPI()
@@ -47,33 +60,62 @@ export default function InventoryPage() {
   const toggleCollapse = (id: number) =>
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const startEditQty = (item: InventoryItem) => {
-    setEditingId(item.id);
-    setEditingQty("");
+  const startSectionEdit = (section: InventorySection) => {
+    const initial: Record<number, string> = {};
+    section.items.forEach((item) => {
+      initial[item.id] = "";
+    });
+    setPendingQty(initial);
+    setEditingSectionId(section.id);
+    setAddingSection(null);
+    setConfirmDeleteId(null);
   };
 
-  const commitQty = async (sectionId: number, itemId: number, oldQty: number) => {
-    const qty = editingQty === "" ? oldQty : parseInt(editingQty);
-    setEditingId(null);
-    if (!isNaN(qty) && qty >= 0 && qty !== oldQty) {
+  const commitSectionEdit = async (sectionId: number) => {
+    const section = sections.find((s) => s.id === sectionId);
+    if (!section) return;
+
+    const resolvedQty = (item: InventoryItem): number => {
+      const raw = pendingQty[item.id];
+      if (raw === "" || raw === undefined) return item.quantity;
+      const parsed = parseInt(raw);
+      return isNaN(parsed) || parsed < 0 ? item.quantity : parsed;
+    };
+
+    const changed = section.items.filter(
+      (item) => resolvedQty(item) !== item.quantity,
+    );
+
+    if (changed.length > 0) {
       try {
-        const updated = await updateItemQuantityAPI(itemId, qty);
+        await Promise.all(
+          changed.map((item) =>
+            updateItemQuantityAPI(item.id, resolvedQty(item)),
+          ),
+        );
         setSections((prev) =>
           prev.map((s) =>
             s.id === sectionId
               ? {
                   ...s,
-                  items: s.items.map((item) =>
-                    item.id === itemId ? { ...item, ...updated } : item,
-                  ),
+                  items: s.items.map((item) => ({
+                    ...item,
+                    quantity: resolvedQty(item),
+                  })),
                 }
               : s,
           ),
         );
       } catch {
         showError("수량 저장에 실패했습니다.");
+        return;
       }
     }
+
+    setEditingSectionId(null);
+    setPendingQty({});
+    setAddingSection(null);
+    setConfirmDeleteId(null);
   };
 
   const handleDelete = async (sectionId: number, itemId: number) => {
@@ -86,6 +128,7 @@ export default function InventoryPage() {
             : s,
         ),
       );
+      setConfirmDeleteId(null);
     } catch {
       showError("삭제에 실패했습니다.");
     }
@@ -102,6 +145,8 @@ export default function InventoryPage() {
           s.id === sectionId ? { ...s, items: [...s.items, newItem] } : s,
         ),
       );
+      // 추가한 아이템을 pendingQty에도 등록
+      setPendingQty((prev) => ({ ...prev, [newItem.id]: "" }));
       setNewName("");
       setNewQty("1");
       setAddingSection(null);
@@ -133,8 +178,6 @@ export default function InventoryPage() {
 
   const handleToggleEditMode = () => {
     setIsEditMode((v) => !v);
-    setAddingSection(null);
-    setEditingId(null);
     setIsAddingSection(false);
     setNewSectionLabel("");
   };
@@ -154,12 +197,14 @@ export default function InventoryPage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>재고</h2>
-        <button
-          className={`${styles.editBtn} ${isEditMode ? styles.editBtnActive : ""}`}
-          onClick={handleToggleEditMode}
-        >
-          {isEditMode ? "완료" : "수정"}
-        </button>
+        {isManagerOrAbove && (
+          <button
+            className={`${styles.editBtn} ${isEditMode ? styles.editBtnActive : ""}`}
+            onClick={handleToggleEditMode}
+          >
+            {isEditMode ? "완료" : "편집"}
+          </button>
+        )}
       </div>
 
       {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
@@ -208,6 +253,7 @@ export default function InventoryPage() {
 
       {sections.map((section) => {
         const isCollapsed = !!collapsed[section.id];
+        const isQtyEditing = editingSectionId === section.id;
         const sorted = sortByQuantity(section.items);
 
         return (
@@ -224,65 +270,117 @@ export default function InventoryPage() {
                 )}
                 <span className={styles.sectionLabel}>{section.label}</span>
               </button>
-              {isEditMode && (
-                <button
-                  className={styles.sectionDeleteBtn}
-                  onClick={() => handleDeleteSection(section.id)}
-                >
-                  삭제
-                </button>
-              )}
+              <div className={styles.sectionHeaderActions}>
+                {!isEditMode && (
+                  <button
+                    className={`${styles.sectionQtyEditBtn} ${isQtyEditing ? styles.sectionQtyEditBtnActive : ""}`}
+                    onClick={() =>
+                      isQtyEditing
+                        ? commitSectionEdit(section.id)
+                        : startSectionEdit(section)
+                    }
+                  >
+                    {isQtyEditing ? "완료" : "수정"}
+                  </button>
+                )}
+                {isEditMode && (
+                  <button
+                    className={styles.sectionDeleteBtn}
+                    onClick={() => handleDeleteSection(section.id)}
+                  >
+                    삭제
+                  </button>
+                )}
+              </div>
             </div>
 
             {!isCollapsed && (
               <>
                 <ul className={styles.list}>
-                  {sorted.map((item) => (
-                    <li
-                      key={item.id}
-                      className={`${styles.item} ${item.quantity === 0 ? styles.itemEmpty : ""}`}
-                    >
-                      <span className={styles.itemName}>{item.name}</span>
-                      <div className={styles.itemRight}>
-                        {editingId === item.id ? (
-                          <input
-                            className={styles.qtyEditInput}
-                            type="number"
-                            min="0"
-                            placeholder={String(item.quantity)}
-                            value={editingQty}
-                            onChange={(e) => setEditingQty(e.target.value)}
-                            onBlur={() =>
-                              commitQty(section.id, item.id, item.quantity)
-                            }
-                            onKeyDown={(e) =>
-                              e.key === "Enter" &&
-                              commitQty(section.id, item.id, item.quantity)
-                            }
-                            autoFocus
-                          />
-                        ) : (
-                          <button
-                            className={styles.qtyBtn}
-                            onClick={() => startEditQty(item)}
-                          >
-                            {item.quantity}
-                          </button>
-                        )}
-                        {isEditMode && (
-                          <button
-                            className={styles.deleteBtn}
-                            onClick={() => handleDelete(section.id, item.id)}
-                          >
-                            삭제
-                          </button>
-                        )}
-                      </div>
-                    </li>
-                  ))}
+                  {sorted.map((item) => {
+                    const pendingStr = pendingQty[item.id] ?? "";
+                    const displayQty =
+                      isQtyEditing && pendingStr !== ""
+                        ? parseInt(pendingStr) || 0
+                        : item.quantity;
+                    const isConfirming = confirmDeleteId === item.id;
+
+                    return (
+                      <li
+                        key={item.id}
+                        className={`${styles.item} ${displayQty === 0 ? styles.itemEmpty : ""}`}
+                      >
+                        <span className={styles.itemName}>{item.name}</span>
+                        <div className={styles.itemRight}>
+                          {isQtyEditing ? (
+                            <input
+                              className={styles.qtyEditInput}
+                              type="number"
+                              min="0"
+                              placeholder={String(item.quantity)}
+                              value={pendingStr}
+                              onChange={(e) =>
+                                setPendingQty((prev) => ({
+                                  ...prev,
+                                  [item.id]: e.target.value,
+                                }))
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  const idx = sorted.findIndex(
+                                    (i) => i.id === item.id,
+                                  );
+                                  const next = sorted[idx + 1];
+                                  if (next) {
+                                    (
+                                      e.currentTarget
+                                        .closest("li")
+                                        ?.nextElementSibling?.querySelector(
+                                          "input[type='number']",
+                                        ) as HTMLInputElement | null
+                                    )?.focus();
+                                  } else {
+                                    commitSectionEdit(section.id);
+                                  }
+                                }
+                              }}
+                            />
+                          ) : (
+                            <span className={styles.qtyText}>{displayQty}</span>
+                          )}
+                          {isQtyEditing && (
+                            isConfirming ? (
+                              <div className={styles.deleteConfirm}>
+                                <span className={styles.deleteConfirmText}>삭제할까요?</span>
+                                <button
+                                  className={styles.deleteCancelBtn}
+                                  onClick={() => setConfirmDeleteId(null)}
+                                >
+                                  취소
+                                </button>
+                                <button
+                                  className={styles.deleteConfirmBtn}
+                                  onClick={() => handleDelete(section.id, item.id)}
+                                >
+                                  삭제
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                className={styles.deleteBtn}
+                                onClick={() => setConfirmDeleteId(item.id)}
+                              >
+                                삭제
+                              </button>
+                            )
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
 
-                {isEditMode && (
+                {isQtyEditing && (
                   <>
                     {addingSection === section.id ? (
                       <div className={styles.addForm}>
@@ -291,12 +389,13 @@ export default function InventoryPage() {
                           placeholder="품목명"
                           value={newName}
                           onChange={(e) => setNewName(e.target.value)}
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && handleAdd(section.id)
-                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") qtyInputRef.current?.focus();
+                          }}
                           autoFocus
                         />
                         <input
+                          ref={qtyInputRef}
                           className={styles.qtyInput}
                           type="number"
                           min="0"
