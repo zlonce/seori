@@ -174,8 +174,12 @@ export default function InventoryPage() {
     try {
       await deleteSectionAPI(sectionId);
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
-    } catch {
-      showError("섹션 삭제에 실패했습니다.");
+      setConfirmDeleteSectionId(null);
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+        ?? "섹션 삭제에 실패했습니다.";
+      showError(message);
     }
   };
 
