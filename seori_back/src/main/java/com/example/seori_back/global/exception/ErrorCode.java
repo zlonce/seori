@@ -27,7 +27,12 @@ public enum ErrorCode {
 
     // SpecialDay
     SPECIAL_DAY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 특정일입니다."),
-    DUPLICATE_SPECIAL_DAY(HttpStatus.CONFLICT, "이미 등록된 특정일입니다.");
+    DUPLICATE_SPECIAL_DAY(HttpStatus.CONFLICT, "이미 등록된 특정일입니다."),
+
+    // Inventory
+    INVENTORY_SECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 섹션입니다."),
+    INVENTORY_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 재고 항목입니다."),
+    INVENTORY_SECTION_NOT_EMPTY(HttpStatus.CONFLICT, "항목이 남아있는 섹션은 삭제할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
