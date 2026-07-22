@@ -40,7 +40,8 @@ export default function InventoryPage() {
   const [addingSection, setAddingSection] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
   const [newQty, setNewQty] = useState("1");
-  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [confirmDeleteSectionId, setConfirmDeleteSectionId] = useState<number | null>(null);
+  const [confirmDeleteItemId, setConfirmDeleteItemId] = useState<number | null>(null);
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const qtyInputRef = useRef<HTMLInputElement>(null);
@@ -68,7 +69,8 @@ export default function InventoryPage() {
     setPendingQty(initial);
     setEditingSectionId(section.id);
     setAddingSection(null);
-    setConfirmDeleteId(null);
+    setConfirmDeleteSectionId(null);
+    setConfirmDeleteItemId(null);
   };
 
   const commitSectionEdit = async (sectionId: number) => {
@@ -115,7 +117,8 @@ export default function InventoryPage() {
     setEditingSectionId(null);
     setPendingQty({});
     setAddingSection(null);
-    setConfirmDeleteId(null);
+    setConfirmDeleteSectionId(null);
+    setConfirmDeleteItemId(null);
   };
 
   const handleDelete = async (sectionId: number, itemId: number) => {
@@ -128,7 +131,7 @@ export default function InventoryPage() {
             : s,
         ),
       );
-      setConfirmDeleteId(null);
+      setConfirmDeleteItemId(null);
     } catch {
       showError("삭제에 실패했습니다.");
     }
@@ -183,7 +186,8 @@ export default function InventoryPage() {
     setEditingSectionId(null);
     setPendingQty({});
     setAddingSection(null);
-    setConfirmDeleteId(null);
+    setConfirmDeleteSectionId(null);
+    setConfirmDeleteItemId(null);
   };
 
   if (loading) {
@@ -288,12 +292,12 @@ export default function InventoryPage() {
                   </button>
                 )}
                 {isEditMode && (
-                  confirmDeleteId === section.id ? (
+                  confirmDeleteSectionId === section.id ? (
                     <div className={styles.deleteConfirm}>
                       <span className={styles.deleteConfirmText}>삭제할까요?</span>
                       <button
                         className={styles.deleteCancelBtn}
-                        onClick={() => setConfirmDeleteId(null)}
+                        onClick={() => setConfirmDeleteSectionId(null)}
                       >
                         취소
                       </button>
@@ -307,7 +311,7 @@ export default function InventoryPage() {
                   ) : (
                     <button
                       className={styles.sectionDeleteBtn}
-                      onClick={() => setConfirmDeleteId(section.id)}
+                      onClick={() => setConfirmDeleteSectionId(section.id)}
                     >
                       삭제
                     </button>
@@ -325,7 +329,7 @@ export default function InventoryPage() {
                       isQtyEditing && pendingStr !== ""
                         ? parseInt(pendingStr) || 0
                         : item.quantity;
-                    const isConfirming = confirmDeleteId === item.id;
+                    const isConfirming = confirmDeleteItemId === item.id;
 
                     return (
                       <li
@@ -376,7 +380,7 @@ export default function InventoryPage() {
                                 <span className={styles.deleteConfirmText}>삭제할까요?</span>
                                 <button
                                   className={styles.deleteCancelBtn}
-                                  onClick={() => setConfirmDeleteId(null)}
+                                  onClick={() => setConfirmDeleteItemId(null)}
                                 >
                                   취소
                                 </button>
@@ -390,7 +394,7 @@ export default function InventoryPage() {
                             ) : (
                               <button
                                 className={styles.deleteBtn}
-                                onClick={() => setConfirmDeleteId(item.id)}
+                                onClick={() => setConfirmDeleteItemId(item.id)}
                               >
                                 삭제
                               </button>
