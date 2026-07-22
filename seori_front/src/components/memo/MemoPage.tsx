@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import styles from "./MemoPage.module.css";
+import ConfirmModal from "../common/ConfirmModal";
 
 interface MemoItem {
   id: number;
@@ -17,6 +18,7 @@ const DUMMY_ITEMS: MemoItem[] = [
 export default function MemoPage() {
   const [items, setItems] = useState<MemoItem[]>(DUMMY_ITEMS);
   const [input, setInput] = useState("");
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleAdd = () => {
@@ -37,8 +39,10 @@ export default function MemoPage() {
     );
   };
 
-  const handleDelete = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+  const handleDeleteConfirm = () => {
+    if (deleteTargetId === null) return;
+    setItems((prev) => prev.filter((item) => item.id !== deleteTargetId));
+    setDeleteTargetId(null);
   };
 
   const sorted = [
@@ -78,7 +82,7 @@ export default function MemoPage() {
             </span>
             <button
               className={styles.deleteBtn}
-              onClick={() => handleDelete(item.id)}
+              onClick={() => setDeleteTargetId(item.id)}
             >
               삭제
             </button>
@@ -88,6 +92,12 @@ export default function MemoPage() {
           <p className={styles.empty}>할 일이 없습니다.</p>
         )}
       </ul>
+      {deleteTargetId !== null && (
+        <ConfirmModal
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setDeleteTargetId(null)}
+        />
+      )}
     </div>
   );
 }
