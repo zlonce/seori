@@ -113,6 +113,16 @@
   color: #e74c3c;
 }
 
+.errorMsg {
+  color: #e74c3c;
+  font-size: 13px;
+  text-align: center;
+  padding: 8px 12px;
+  background: #fff0f0;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
 .empty {
   text-align: center;
   color: #bbb;
