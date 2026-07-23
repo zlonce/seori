@@ -35,7 +35,10 @@ public enum ErrorCode {
     INVENTORY_SECTION_NOT_EMPTY(HttpStatus.CONFLICT, "항목이 남아있는 섹션은 삭제할 수 없습니다."),
 
     // Memo
-    MEMO_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메모 항목입니다.");
+    MEMO_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메모 항목입니다."),
+
+    // Notice
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공지사항입니다.");
 
     private final HttpStatus status;
     private final String message;
