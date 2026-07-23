@@ -1,48 +1,65 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./MemoPage.module.css";
 import ConfirmModal from "../common/ConfirmModal";
-
-interface MemoItem {
-  id: number;
-  text: string;
-  done: boolean;
-}
-
-// TODO: API 연결 시 제거
-const DUMMY_ITEMS: MemoItem[] = [
-  { id: 1, text: "설탕", done: false },
-  { id: 2, text: "쌈장", done: false },
-  { id: 3, text: "마늘", done: true },
-];
+import {
+  getMemosAPI,
+  createMemoAPI,
+  toggleMemoAPI,
+  deleteMemoAPI,
+  type MemoItem,
+} from "../../api/memo";
 
 export default function MemoPage() {
-  const [items, setItems] = useState<MemoItem[]>(DUMMY_ITEMS);
+  const [items, setItems] = useState<MemoItem[]>([]);
   const [input, setInput] = useState("");
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleAdd = () => {
+  const showError = (msg: string) => {
+    setErrorMsg(msg);
+    setTimeout(() => setErrorMsg(null), 3000);
+  };
+
+  useEffect(() => {
+    getMemosAPI()
+      .then(setItems)
+      .catch(() => showError("목록을 불러오지 못했습니다."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleAdd = async () => {
     if (!input.trim()) return;
-    setItems((prev) => [
-      { id: Date.now(), text: input.trim(), done: false },
-      ...prev,
-    ]);
-    setInput("");
-    inputRef.current?.focus();
+    try {
+      const newItem = await createMemoAPI(input.trim());
+      setItems((prev) => [newItem, ...prev]);
+      setInput("");
+      inputRef.current?.focus();
+    } catch {
+      showError("추가에 실패했습니다.");
+    }
   };
 
-  const handleToggle = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, done: !item.done } : item
-      )
-    );
+  const handleToggle = async (id: number) => {
+    try {
+      const updated = await toggleMemoAPI(id);
+      setItems((prev) => prev.map((item) => (item.id === id ? updated : item)));
+    } catch {
+      showError("상태 변경에 실패했습니다.");
+    }
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteTargetId === null) return;
-    setItems((prev) => prev.filter((item) => item.id !== deleteTargetId));
-    setDeleteTargetId(null);
+    try {
+      await deleteMemoAPI(deleteTargetId);
+      setItems((prev) => prev.filter((item) => item.id !== deleteTargetId));
+      setDeleteTargetId(null);
+    } catch {
+      showError("삭제에 실패했습니다.");
+      setDeleteTargetId(null);
+    }
   };
 
   const sorted = [
@@ -50,15 +67,26 @@ export default function MemoPage() {
     ...items.filter((item) => item.done),
   ];
 
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <h2 className={styles.title}>메모</h2>
+        <p className={styles.empty}>불러오는 중...</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>메모</h2>
+      {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
 
       <div className={styles.inputRow}>
         <input
           ref={inputRef}
           className={styles.input}
           placeholder="추가할 내용을 입력하세요"
+          maxLength={50}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
