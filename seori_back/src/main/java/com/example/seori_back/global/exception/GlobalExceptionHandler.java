@@ -1,6 +1,5 @@
 package com.example.seori_back.global.exception;
 
-import com.example.seori_back.global.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

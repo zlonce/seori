@@ -180,38 +180,6 @@
   color: #e74c3c;
 }
 
-.deleteConfirm {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.deleteConfirmText {
-  font-size: 12px;
-  color: #888;
-  white-space: nowrap;
-}
-
-.deleteCancelBtn {
-  background: none;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 3px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  color: #888;
-}
-
-.deleteConfirmBtn {
-  background: #e74c3c;
-  border: none;
-  border-radius: 4px;
-  padding: 3px 8px;
-  font-size: 12px;
-  cursor: pointer;
-  color: #fff;
-}
-
 .addItemBtn {
   width: 100%;
   background: none;

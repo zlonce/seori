@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import ConfirmModal from "../common/ConfirmModal";
 import {
   getSectionsAPI,
   addItemAPI,
@@ -40,8 +41,7 @@ export default function InventoryPage() {
   const [addingSection, setAddingSection] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
   const [newQty, setNewQty] = useState("1");
-  const [confirmDeleteSectionId, setConfirmDeleteSectionId] = useState<number | null>(null);
-  const [confirmDeleteItemId, setConfirmDeleteItemId] = useState<number | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<(() => Promise<void>) | null>(null);
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const qtyInputRef = useRef<HTMLInputElement>(null);
@@ -69,8 +69,7 @@ export default function InventoryPage() {
     setPendingQty(initial);
     setEditingSectionId(section.id);
     setAddingSection(null);
-    setConfirmDeleteSectionId(null);
-    setConfirmDeleteItemId(null);
+    setPendingDelete(null);
   };
 
   const commitSectionEdit = async (sectionId: number) => {
@@ -117,8 +116,7 @@ export default function InventoryPage() {
     setEditingSectionId(null);
     setPendingQty({});
     setAddingSection(null);
-    setConfirmDeleteSectionId(null);
-    setConfirmDeleteItemId(null);
+    setPendingDelete(null);
   };
 
   const handleDelete = async (sectionId: number, itemId: number) => {
@@ -131,7 +129,7 @@ export default function InventoryPage() {
             : s,
         ),
       );
-      setConfirmDeleteItemId(null);
+      setPendingDelete(null);
     } catch {
       showError("삭제에 실패했습니다.");
     }
@@ -174,7 +172,7 @@ export default function InventoryPage() {
     try {
       await deleteSectionAPI(sectionId);
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
-      setConfirmDeleteSectionId(null);
+      setPendingDelete(null);
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -190,8 +188,7 @@ export default function InventoryPage() {
     setEditingSectionId(null);
     setPendingQty({});
     setAddingSection(null);
-    setConfirmDeleteSectionId(null);
-    setConfirmDeleteItemId(null);
+    setPendingDelete(null);
   };
 
   if (loading) {
@@ -296,30 +293,12 @@ export default function InventoryPage() {
                   </button>
                 )}
                 {isEditMode && (
-                  confirmDeleteSectionId === section.id ? (
-                    <div className={styles.deleteConfirm}>
-                      <span className={styles.deleteConfirmText}>삭제할까요?</span>
-                      <button
-                        className={styles.deleteCancelBtn}
-                        onClick={() => setConfirmDeleteSectionId(null)}
-                      >
-                        취소
-                      </button>
-                      <button
-                        className={styles.deleteConfirmBtn}
-                        onClick={() => handleDeleteSection(section.id)}
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      className={styles.sectionDeleteBtn}
-                      onClick={() => setConfirmDeleteSectionId(section.id)}
-                    >
-                      삭제
-                    </button>
-                  )
+                  <button
+                    className={styles.sectionDeleteBtn}
+                    onClick={() => setPendingDelete(() => () => handleDeleteSection(section.id))}
+                  >
+                    삭제
+                  </button>
                 )}
               </div>
             </div>
@@ -333,8 +312,6 @@ export default function InventoryPage() {
                       isQtyEditing && pendingStr !== ""
                         ? parseInt(pendingStr) || 0
                         : item.quantity;
-                    const isConfirming = confirmDeleteItemId === item.id;
-
                     return (
                       <li
                         key={item.id}
@@ -379,30 +356,12 @@ export default function InventoryPage() {
                             <span className={styles.qtyText}>{displayQty}</span>
                           )}
                           {isQtyEditing && (
-                            isConfirming ? (
-                              <div className={styles.deleteConfirm}>
-                                <span className={styles.deleteConfirmText}>삭제할까요?</span>
-                                <button
-                                  className={styles.deleteCancelBtn}
-                                  onClick={() => setConfirmDeleteItemId(null)}
-                                >
-                                  취소
-                                </button>
-                                <button
-                                  className={styles.deleteConfirmBtn}
-                                  onClick={() => handleDelete(section.id, item.id)}
-                                >
-                                  삭제
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                className={styles.deleteBtn}
-                                onClick={() => setConfirmDeleteItemId(item.id)}
-                              >
-                                삭제
-                              </button>
-                            )
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={() => setPendingDelete(() => () => handleDelete(section.id, item.id))}
+                            >
+                              삭제
+                            </button>
                           )}
                         </div>
                       </li>
@@ -469,6 +428,12 @@ export default function InventoryPage() {
           </div>
         );
       })}
+      {pendingDelete !== null && (
+        <ConfirmModal
+          onConfirm={() => pendingDelete()}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
     </div>
   );
 }

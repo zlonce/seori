@@ -1,6 +1,5 @@
-package com.example.seori_back.global.dto;
+package com.example.seori_back.global.exception;
 
-import com.example.seori_back.global.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
