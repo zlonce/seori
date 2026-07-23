@@ -8,6 +8,7 @@ public record NoticeResponseDto(
         Long id,
         String title,
         String content,
+        LocalDate createdAt,
         LocalDate updatedAt
 ) {
     public static NoticeResponseDto from(Notice notice) {
@@ -15,6 +16,7 @@ public record NoticeResponseDto(
                 notice.getId(),
                 notice.getTitle(),
                 notice.getContent(),
+                notice.getCreatedAt().toLocalDate(),
                 notice.getUpdatedAt().toLocalDate()
         );
     }

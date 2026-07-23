@@ -168,7 +168,10 @@ export default function NoticePage() {
         {errorMsg && <p className={styles.errorMsg}>{errorMsg}</p>}
         <h2 className={styles.detailTitle}>{selected.title}</h2>
         <div className={styles.detailMeta}>
-          <span>{selected.updatedAt}</span>
+          <span>작성 {selected.createdAt}</span>
+          {selected.createdAt !== selected.updatedAt && (
+            <span>수정 {selected.updatedAt}</span>
+          )}
         </div>
         <div className={styles.viewerWrap}>
           <NoticeViewer content={selected.content} />

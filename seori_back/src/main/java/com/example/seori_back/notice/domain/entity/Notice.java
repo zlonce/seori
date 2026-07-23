@@ -28,6 +28,9 @@ public class Notice {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
@@ -35,7 +38,9 @@ public class Notice {
         Notice notice = new Notice();
         notice.title = title;
         notice.content = content;
-        notice.updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        notice.createdAt = now;
+        notice.updatedAt = now;
         return notice;
     }
 
