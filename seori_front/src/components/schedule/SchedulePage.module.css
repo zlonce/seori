@@ -1,0 +1,578 @@
+.container {
+  padding: 0;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+}
+
+.createBtn {
+  background: #c94444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.createBtn:hover {
+  background: #a83030;
+}
+
+/* ── 주 생성 폼 ── */
+.createForm {
+  background: #fff;
+  border: 2px dashed #d0e4f7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.createFormHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 14px;
+}
+
+.createFormLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a90e2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.createFormWeek {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.createFormHint {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+/* ── 마감일 입력 ── */
+.deadlineInput {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.deadlineInput:focus {
+  border-color: #4a90e2;
+}
+
+/* ── 영업일 토글 그리드 ── */
+.dayToggleGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.dayToggleBtn {
+  padding: 9px 2px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+}
+
+.dayToggleBtnOn {
+  background: #fce8e8;
+  color: #c94444;
+  border-color: #e07070;
+}
+
+.dayToggleBtnOff {
+  background: #f5f5f5;
+  color: #ccc;
+  border-color: #ebebeb;
+}
+
+/* ── 공통 폼 액션 버튼 ── */
+.formActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: none;
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #f5f5f5;
+}
+
+.submitBtn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #c94444;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: #a83030;
+}
+
+/* ── 주차 네비게이션 ── */
+.weekNav {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
+}
+
+.navBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.navBtn:disabled {
+  color: #ddd;
+  cursor: default;
+}
+
+.navBtn:not(:disabled):hover {
+  background: #f5f5f5;
+}
+
+.weekCenter {
+  flex: 1;
+  text-align: center;
+}
+
+.weekRange {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 5px;
+}
+
+.weekMeta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.deadline {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ── 상태 뱃지 ── */
+.badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+.badgeVoting {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badgeClosed {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.badgeConfirmed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* ── 영업일 수정 버튼 (weekMeta 안) ── */
+.editDaysBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.editDaysBtn:hover {
+  background: #f5f5f5;
+}
+
+/* ── 영업일 수정 패널 ── */
+.editDaysPanel {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
+}
+
+.editDaysPanelTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 14px;
+}
+
+/* ── 섹션 카드 ── */
+.section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #aaa;
+  margin: 0 0 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* ── 내 투표 그리드 ── */
+.myVoteGrid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dayBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 42px;
+  padding: 10px 4px;
+  border: 2px solid #e8e8e8;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  gap: 4px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.dayBtn:hover {
+  border-color: #bbb;
+}
+
+.dayBtnOn {
+  border-color: #4caf50;
+  background: #f1f8e9;
+}
+
+.dayBtnName {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+}
+
+.dayBtnDate {
+  font-size: 17px;
+  font-weight: 700;
+  color: #333;
+}
+
+.dayBtnOn .dayBtnName {
+  color: #388e3c;
+}
+
+.dayBtnOn .dayBtnDate {
+  color: #2e7d32;
+}
+
+/* ── 투표 저장 버튼 ── */
+.saveVoteBtn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f0f0f0;
+  color: #ccc;
+  cursor: default;
+  transition: all 0.15s;
+}
+
+.saveVoteBtnActive {
+  background: #c94444;
+  color: #fff;
+  cursor: pointer;
+}
+
+.saveVoteBtnActive:hover {
+  background: #a83030;
+}
+
+/* ── 날짜별 행 (투표현황 / 배정 / 확정) ── */
+.dateRows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dateRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 28px;
+}
+
+.dateLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 32px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.dayNameBold {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+
+.daySmDate {
+  font-size: 11px;
+  color: #bbb;
+  margin-top: 1px;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding-top: 2px;
+}
+
+/* ── 투표자 태그 ── */
+.voterTag {
+  font-size: 12px;
+  background: #f0f0f0;
+  color: #555;
+  padding: 3px 11px;
+  border-radius: 20px;
+}
+
+.voterTagMe {
+  background: #f1f8e9;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.noOne {
+  font-size: 12px;
+  color: #ddd;
+}
+
+/* ── 배정 편집 태그 ── */
+.assignHint {
+  font-size: 12px;
+  color: #aaa;
+  margin: -8px 0 14px;
+}
+
+.assignTag {
+  font-size: 12px;
+  background: #f0f0f0;
+  color: #555;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.assignTag:hover {
+  border-color: #ccc;
+}
+
+.assignTagOn {
+  background: #f1f8e9;
+  color: #2e7d32;
+  border-color: #4caf50;
+  font-weight: 600;
+}
+
+.assignTagVoted {
+  background: #f3f8ff;
+  border-color: #90caf9;
+  color: #1565c0;
+}
+
+.check {
+  color: #4caf50;
+}
+
+/* ── 확정 일정 헤더 ── */
+.confirmedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.confirmedHeader .sectionTitle {
+  margin-bottom: 0;
+}
+
+.editConfirmedBtn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.editConfirmedBtn:hover {
+  background: #f5f5f5;
+}
+
+/* ── 확정 일정 태그 ── */
+.confirmedName {
+  font-size: 12px;
+  background: #f0f0f0;
+  color: #555;
+  padding: 3px 11px;
+  border-radius: 20px;
+}
+
+.restDay {
+  font-size: 12px;
+  color: #ddd;
+}
+
+/* ── 액션 버튼 ── */
+.closeBtn {
+  width: 100%;
+  padding: 13px;
+  background: #c94444;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: background 0.15s;
+}
+
+.closeBtn:hover {
+  background: #a83030;
+}
+
+.confirmBtn {
+  width: 100%;
+  padding: 13px;
+  background: #c94444;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 2px;
+  transition: background 0.15s;
+}
+
+.confirmBtn:hover {
+  background: #a83030;
+}
+
+/* ── 투표 현황 토글 (CONFIRMED) ── */
+.voteHistoryToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+}
+
+.voteHistoryToggle:hover {
+  color: #888;
+}
+
+.toggleArrow {
+  font-size: 10px;
+}
+
+.voteHistoryBody {
+  margin-top: 14px;
+}
+
+/* ── 기타 ── */
+.waitMsg {
+  text-align: center;
+  color: #bbb;
+  font-size: 14px;
+  padding: 24px 0;
+}

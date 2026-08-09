@@ -11,16 +11,12 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      navigate(user.role === "ROLE_OWNER" ? "/dashboard/owner" : "/dashboard/staff");
+      navigate("/schedule");
     }
   }, [isAuthenticated, user, navigate]);
 
-  const handleLoginSuccess = (user: User) => {
-    if (user.role === "ROLE_OWNER") {
-      navigate("/dashboard/owner");
-    } else {
-      navigate("/dashboard/staff");
-    }
+  const handleLoginSuccess = (_user: User) => {
+    navigate("/schedule");
   };
 
   return (
