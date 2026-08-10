@@ -8,12 +8,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +30,7 @@ public class WorkRecordController {
 
     @GetMapping("/my")
     public ResponseEntity<List<WorkRecordResponseDto>> getMyRecords(
-            @RequestAttribute String userId,
+            @AuthenticationPrincipal String userId,
             @RequestParam int year,
             @RequestParam int month) {
         return ResponseEntity.ok(workRecordService.getMyRecords(userId, year, month));
@@ -47,14 +47,14 @@ public class WorkRecordController {
 
     @PostMapping
     public ResponseEntity<WorkRecordResponseDto> create(
-            @RequestAttribute String userId,
+            @AuthenticationPrincipal String userId,
             @RequestBody @Valid CreateWorkRecordRequestDto request) {
         return ResponseEntity.ok(workRecordService.create(userId, request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<WorkRecordResponseDto> update(
-            @RequestAttribute String userId,
+            @AuthenticationPrincipal String userId,
             @PathVariable Long id,
             @RequestBody @Valid UpdateWorkRecordRequestDto request) {
         return ResponseEntity.ok(workRecordService.update(userId, id, request));
@@ -62,7 +62,7 @@ public class WorkRecordController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @RequestAttribute String userId,
+            @AuthenticationPrincipal String userId,
             @PathVariable Long id) {
         workRecordService.delete(userId, id);
         return ResponseEntity.ok().build();
