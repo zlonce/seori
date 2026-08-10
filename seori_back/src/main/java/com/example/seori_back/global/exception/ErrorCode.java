@@ -38,7 +38,12 @@ public enum ErrorCode {
     MEMO_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메모 항목입니다."),
 
     // Notice
-    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공지사항입니다.");
+    NOTICE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공지사항입니다."),
+
+    // Schedule
+    SCHEDULE_WEEK_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주차입니다."),
+    SCHEDULE_INVALID_STATUS(HttpStatus.BAD_REQUEST, "현재 상태에서 허용되지 않는 작업입니다."),
+    SCHEDULE_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, "확정된 일정의 영업일은 수정할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
