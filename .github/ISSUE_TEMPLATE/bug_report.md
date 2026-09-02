@@ -1,38 +1,35 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: 오류 해결 이슈
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## 문제 설명
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+어떤 버그인지 간략히 설명해주세요.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## 발생 위치
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+- 파일:
+- 라인:
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## 현재 동작
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+실제로 어떻게 동작하는지 설명해주세요.
 
-**Additional context**
-Add any other context about the problem here.
+## 기대 동작
+
+어떻게 동작해야 하는지 설명해주세요.
+
+## 수정 방향
+
+- 
+
+## 체크리스트
+
+- [ ] 로컬에서 수정 사항 확인
+- [ ] 관련 기능 회귀 없음 확인
+- [ ] 불필요한 코드/로그 제거
