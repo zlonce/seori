@@ -9,8 +9,7 @@ public record StaffSummaryResponseDto(
         String phone,
         UserRoleEnum role,
         int hourlyWage,
-        int overtimeWage,
-        int weeklyWorkDays
+        int overtimeWage
 ) {
     public static StaffSummaryResponseDto from(User user) {
         return new StaffSummaryResponseDto(
@@ -19,8 +18,7 @@ public record StaffSummaryResponseDto(
                 user.getPhone(),
                 user.getRole(),
                 user.getHourlyWage(),
-                user.getOvertimeWage(),
-                user.getWeeklyWorkDays()
+                user.getOvertimeWage()
         );
     }
 }

@@ -9,13 +9,12 @@ export interface StaffSummary {
   role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
-  weeklyWorkDays: number;
 }
 
 export const getStaffListAPI = () =>
   client.get<StaffSummary[]>("/users/staff").then((r) => r.data);
 
-export const updateStaffProfileAPI = (userId: string, data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; weeklyWorkDays: number }) =>
+export const updateStaffProfileAPI = (userId: string, data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number }) =>
   client.patch(`/users/${userId}/profile`, data);
 
 export const createUserAPI = (data: {
@@ -24,5 +23,4 @@ export const createUserAPI = (data: {
   role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
-  weeklyWorkDays: number;
 }) => client.post("/users", data);

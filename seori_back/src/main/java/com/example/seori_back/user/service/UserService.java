@@ -41,7 +41,7 @@ public class UserService {
         }
 
         String encoded = passwordEncoder.encode(userId);
-        User user = User.create(userId, encoded, request.phone(), request.name(), request.role(), request.hourlyWage(), request.overtimeWage(), request.weeklyWorkDays());
+        User user = User.create(userId, encoded, request.phone(), request.name(), request.role(), request.hourlyWage(), request.overtimeWage());
         userRepository.save(user);
     }
 
@@ -96,7 +96,7 @@ public class UserService {
     public void updateStaff(String userId, UpdateStaffRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.updateProfile(request.name(), request.role(), request.hourlyWage(), request.overtimeWage(), request.weeklyWorkDays());
+        user.updateProfile(request.name(), request.role(), request.hourlyWage(), request.overtimeWage());
     }
 
     @Transactional

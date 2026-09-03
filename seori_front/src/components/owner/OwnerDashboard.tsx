@@ -34,13 +34,11 @@ export default function OwnerDashboard() {
     role: UserRole;
     hourlyWage: number;
     overtimeWage: number;
-    weeklyWorkDays: number;
   }>({
     name: "",
     role: "STAFF",
     hourlyWage: 0,
     overtimeWage: 0,
-    weeklyWorkDays: 2,
   });
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createForm, setCreateForm] = useState({
@@ -48,7 +46,6 @@ export default function OwnerDashboard() {
     name: "",
     hourlyWage: 0,
     overtimeWage: 0,
-    weeklyWorkDays: 2,
   });
 
   const now = new Date();
@@ -139,7 +136,6 @@ export default function OwnerDashboard() {
       role: s.role,
       hourlyWage: s.hourlyWage,
       overtimeWage: s.overtimeWage,
-      weeklyWorkDays: s.weeklyWorkDays,
     });
   };
 
@@ -157,7 +153,6 @@ export default function OwnerDashboard() {
       name: "",
       hourlyWage: 0,
       overtimeWage: 0,
-      weeklyWorkDays: 2,
     });
     fetchStaff();
   };
@@ -241,22 +236,6 @@ export default function OwnerDashboard() {
                 }
                 type="number"
               />
-              <div className={styles.field}>
-                <label className={styles.fieldLabel}>주당 근무일</label>
-                <select
-                  className={styles.select}
-                  value={createForm.weeklyWorkDays}
-                  onChange={(e) =>
-                    setCreateForm((f) => ({
-                      ...f,
-                      weeklyWorkDays: Number(e.target.value),
-                    }))
-                  }
-                >
-                  <option value={1}>1일</option>
-                  <option value={2}>2일</option>
-                </select>
-              </div>
               <div className={styles.btnRow}>
                 <button
                   className={styles.cancelBtn}
@@ -314,22 +293,6 @@ export default function OwnerDashboard() {
                     }
                     type="number"
                   />
-                  <div className={styles.field}>
-                    <label className={styles.fieldLabel}>주당 근무일</label>
-                    <select
-                      className={styles.select}
-                      value={editForm.weeklyWorkDays}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          weeklyWorkDays: Number(e.target.value),
-                        }))
-                      }
-                    >
-                      <option value={1}>1일</option>
-                      <option value={2}>2일</option>
-                    </select>
-                  </div>
                   <div className={styles.btnRow}>
                     <button
                       className={styles.cancelBtn}
@@ -350,7 +313,7 @@ export default function OwnerDashboard() {
                   <span>
                     {s.role === "MANAGER" ? "매니저" : "알바생"} · 기본{" "}
                     {s.hourlyWage.toLocaleString()}원 / 초과{" "}
-                    {s.overtimeWage.toLocaleString()}원 / 주{s.weeklyWorkDays}일
+                    {s.overtimeWage.toLocaleString()}원
                   </span>
                   <button
                     className={styles.editBtn}
