@@ -36,6 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 
+### Gradle cache ###
+native/
+wrapper/
+
 ### Secrets ###
 application.yaml
 application.properties

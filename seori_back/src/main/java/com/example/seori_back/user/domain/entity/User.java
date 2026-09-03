@@ -39,10 +39,7 @@ public class User {
     @Column(nullable = false)
     private int overtimeWage;
 
-    @Column(nullable = false)
-    private int weeklyWorkDays;
-
-    public static User create(String userId, String encodedPassword, String phone, String name, UserRoleEnum role, int hourlyWage, int overtimeWage, int weeklyWorkDays) {
+    public static User create(String userId, String encodedPassword, String phone, String name, UserRoleEnum role, int hourlyWage, int overtimeWage) {
         User user = new User();
         user.userId = userId;
         user.password = encodedPassword;
@@ -51,7 +48,6 @@ public class User {
         user.role = role;
         user.hourlyWage = hourlyWage;
         user.overtimeWage = overtimeWage;
-        user.weeklyWorkDays = weeklyWorkDays;
         return user;
     }
 
@@ -59,11 +55,10 @@ public class User {
         this.password = encodedPassword;
     }
 
-    public void updateProfile(String name, UserRoleEnum role, int hourlyWage, int overtimeWage, int weeklyWorkDays) {
+    public void updateProfile(String name, UserRoleEnum role, int hourlyWage, int overtimeWage) {
         this.name = name;
         this.role = role;
         this.hourlyWage = hourlyWage;
         this.overtimeWage = overtimeWage;
-        this.weeklyWorkDays = weeklyWorkDays;
     }
 }
