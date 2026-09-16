@@ -1,24 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import ConfirmModal from "../common/ConfirmModal";
+import SectionCard from "./SectionCard";
 import {
   getSectionsAPI,
-  addItemAPI,
-  updateItemQuantityAPI,
-  deleteItemAPI,
   createSectionAPI,
   deleteSectionAPI,
 } from "../../api/inventory";
-import type { InventorySection, InventoryItem } from "../../api/inventory";
+import type { InventorySection } from "../../api/inventory";
 import { useAuth } from "../../hooks/useAuth";
 import styles from "./InventoryPage.module.css";
-
-const sortByQuantity = (items: InventoryItem[]) =>
-  [...items].sort((a, b) => {
-    if (a.quantity === 0 && b.quantity !== 0) return 1;
-    if (a.quantity !== 0 && b.quantity === 0) return -1;
-    return 0;
-  });
 
 export default function InventoryPage() {
   const { user } = useAuth();
@@ -27,24 +17,11 @@ export default function InventoryPage() {
 
   const [sections, setSections] = useState<InventorySection[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // owner/manager 전용: 섹션 추가·삭제 모드
   const [isEditMode, setIsEditMode] = useState(false);
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [newSectionLabel, setNewSectionLabel] = useState("");
-
-  const [collapsed, setCollapsed] = useState<Record<number, boolean>>({});
-
-  // 섹션별 수정 모드: 수량 수정 + 아이템 추가·삭제
-  const [editingSectionId, setEditingSectionId] = useState<number | null>(null);
-  const [pendingQty, setPendingQty] = useState<Record<number, string>>({});
-  const [addingSection, setAddingSection] = useState<number | null>(null);
-  const [newName, setNewName] = useState("");
-  const [newQty, setNewQty] = useState("1");
-  const [pendingDelete, setPendingDelete] = useState<(() => Promise<void>) | null>(null);
-
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const qtyInputRef = useRef<HTMLInputElement>(null);
+  const [pendingDelete, setPendingDelete] = useState<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     getSectionsAPI()
@@ -56,104 +33,6 @@ export default function InventoryPage() {
   const showError = (msg: string) => {
     setErrorMsg(msg);
     setTimeout(() => setErrorMsg(null), 3000);
-  };
-
-  const toggleCollapse = (id: number) =>
-    setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
-
-  const startSectionEdit = (section: InventorySection) => {
-    const initial: Record<number, string> = {};
-    section.items.forEach((item) => {
-      initial[item.id] = "";
-    });
-    setPendingQty(initial);
-    setEditingSectionId(section.id);
-    setAddingSection(null);
-    setPendingDelete(null);
-  };
-
-  const commitSectionEdit = async (sectionId: number) => {
-    const section = sections.find((s) => s.id === sectionId);
-    if (!section) return;
-
-    const resolvedQty = (item: InventoryItem): number => {
-      const raw = pendingQty[item.id];
-      if (raw === "" || raw === undefined) return item.quantity;
-      const parsed = parseInt(raw);
-      return isNaN(parsed) || parsed < 0 ? item.quantity : parsed;
-    };
-
-    const changed = section.items.filter(
-      (item) => resolvedQty(item) !== item.quantity,
-    );
-
-    if (changed.length > 0) {
-      try {
-        await Promise.all(
-          changed.map((item) =>
-            updateItemQuantityAPI(item.id, resolvedQty(item)),
-          ),
-        );
-        setSections((prev) =>
-          prev.map((s) =>
-            s.id === sectionId
-              ? {
-                  ...s,
-                  items: s.items.map((item) => ({
-                    ...item,
-                    quantity: resolvedQty(item),
-                  })),
-                }
-              : s,
-          ),
-        );
-      } catch {
-        showError("수량 저장에 실패했습니다.");
-        return;
-      }
-    }
-
-    setEditingSectionId(null);
-    setPendingQty({});
-    setAddingSection(null);
-    setPendingDelete(null);
-  };
-
-  const handleDelete = async (sectionId: number, itemId: number) => {
-    try {
-      await deleteItemAPI(itemId);
-      setSections((prev) =>
-        prev.map((s) =>
-          s.id === sectionId
-            ? { ...s, items: s.items.filter((item) => item.id !== itemId) }
-            : s,
-        ),
-      );
-      setPendingDelete(null);
-    } catch {
-      showError("삭제에 실패했습니다.");
-    }
-  };
-
-  const handleAdd = async (sectionId: number) => {
-    if (!newName.trim()) return;
-    const qty = parseInt(newQty);
-    const quantity = isNaN(qty) || qty < 0 ? 0 : qty;
-    try {
-      const newItem = await addItemAPI(sectionId, newName.trim(), quantity);
-      setSections((prev) =>
-        prev.map((s) =>
-          s.id === sectionId ? { ...s, items: [...s.items, newItem] } : s,
-        ),
-      );
-      // 추가한 아이템을 pendingQty에도 등록
-      setPendingQty((prev) => ({ ...prev, [newItem.id]: "" }));
-      setNewName("");
-      setNewQty("1");
-      setAddingSection(null);
-    } catch {
-      showError("추가에 실패했습니다.");
-    }
   };
 
   const handleCreateSection = async () => {
@@ -185,10 +64,6 @@ export default function InventoryPage() {
     setIsEditMode((v) => !v);
     setIsAddingSection(false);
     setNewSectionLabel("");
-    setEditingSectionId(null);
-    setPendingQty({});
-    setAddingSection(null);
-    setPendingDelete(null);
   };
 
   if (loading) {
@@ -237,10 +112,7 @@ export default function InventoryPage() {
               <div className={styles.formBtns}>
                 <button
                   className={styles.cancelBtn}
-                  onClick={() => {
-                    setIsAddingSection(false);
-                    setNewSectionLabel("");
-                  }}
+                  onClick={() => { setIsAddingSection(false); setNewSectionLabel(""); }}
                 >
                   취소
                 </button>
@@ -260,174 +132,20 @@ export default function InventoryPage() {
         </div>
       )}
 
-      {sections.map((section) => {
-        const isCollapsed = !!collapsed[section.id];
-        const isQtyEditing = editingSectionId === section.id;
-        const sorted = sortByQuantity(section.items);
+      {sections.map((section) => (
+        <SectionCard
+          key={section.id}
+          section={section}
+          isEditMode={isEditMode}
+          onSectionsChange={setSections}
+          onError={showError}
+          onPendingDelete={(fn) => setPendingDelete(() => fn)}
+          onDeleteSection={() =>
+            setPendingDelete(() => () => handleDeleteSection(section.id))
+          }
+        />
+      ))}
 
-        return (
-          <div key={section.id} className={styles.section}>
-            <div className={styles.sectionHeaderRow}>
-              <button
-                className={styles.sectionHeader}
-                onClick={() => toggleCollapse(section.id)}
-              >
-                {isCollapsed ? (
-                  <ChevronRight size={16} color="#888" />
-                ) : (
-                  <ChevronDown size={16} color="#888" />
-                )}
-                <span className={styles.sectionLabel}>{section.label}</span>
-              </button>
-              <div className={styles.sectionHeaderActions}>
-                {!isEditMode && (
-                  <button
-                    className={`${styles.sectionQtyEditBtn} ${isQtyEditing ? styles.sectionQtyEditBtnActive : ""}`}
-                    onClick={() =>
-                      isQtyEditing
-                        ? commitSectionEdit(section.id)
-                        : startSectionEdit(section)
-                    }
-                  >
-                    {isQtyEditing ? "완료" : "수정"}
-                  </button>
-                )}
-                {isEditMode && (
-                  <button
-                    className={styles.sectionDeleteBtn}
-                    onClick={() => setPendingDelete(() => () => handleDeleteSection(section.id))}
-                  >
-                    삭제
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {!isCollapsed && (
-              <>
-                <ul className={styles.list}>
-                  {sorted.map((item) => {
-                    const pendingStr = pendingQty[item.id] ?? "";
-                    const displayQty =
-                      isQtyEditing && pendingStr !== ""
-                        ? parseInt(pendingStr) || 0
-                        : item.quantity;
-                    return (
-                      <li
-                        key={item.id}
-                        className={`${styles.item} ${displayQty === 0 ? styles.itemEmpty : ""}`}
-                      >
-                        <span className={styles.itemName}>{item.name}</span>
-                        <div className={styles.itemRight}>
-                          {isQtyEditing ? (
-                            <input
-                              className={styles.qtyEditInput}
-                              type="number"
-                              min="0"
-                              placeholder={String(item.quantity)}
-                              value={pendingStr}
-                              onChange={(e) =>
-                                setPendingQty((prev) => ({
-                                  ...prev,
-                                  [item.id]: e.target.value,
-                                }))
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  const idx = sorted.findIndex(
-                                    (i) => i.id === item.id,
-                                  );
-                                  const next = sorted[idx + 1];
-                                  if (next) {
-                                    (
-                                      e.currentTarget
-                                        .closest("li")
-                                        ?.nextElementSibling?.querySelector(
-                                          "input[type='number']",
-                                        ) as HTMLInputElement | null
-                                    )?.focus();
-                                  } else {
-                                    commitSectionEdit(section.id);
-                                  }
-                                }
-                              }}
-                            />
-                          ) : (
-                            <span className={styles.qtyText}>{displayQty}</span>
-                          )}
-                          {isQtyEditing && (
-                            <button
-                              className={styles.deleteBtn}
-                              onClick={() => setPendingDelete(() => () => handleDelete(section.id, item.id))}
-                            >
-                              삭제
-                            </button>
-                          )}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-
-                {isQtyEditing && (
-                  <>
-                    {addingSection === section.id ? (
-                      <div className={styles.addForm}>
-                        <input
-                          className={styles.nameInput}
-                          placeholder="품목명"
-                          value={newName}
-                          onChange={(e) => setNewName(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") qtyInputRef.current?.focus();
-                          }}
-                          autoFocus
-                        />
-                        <input
-                          ref={qtyInputRef}
-                          className={styles.qtyInput}
-                          type="number"
-                          min="0"
-                          value={newQty}
-                          onChange={(e) => setNewQty(e.target.value)}
-                          onKeyDown={(e) =>
-                            e.key === "Enter" && handleAdd(section.id)
-                          }
-                        />
-                        <div className={styles.formBtns}>
-                          <button
-                            className={styles.cancelBtn}
-                            onClick={() => setAddingSection(null)}
-                          >
-                            취소
-                          </button>
-                          <button
-                            className={styles.saveBtn}
-                            onClick={() => handleAdd(section.id)}
-                          >
-                            추가
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button
-                        className={styles.addItemBtn}
-                        onClick={() => {
-                          setAddingSection(section.id);
-                          setNewName("");
-                          setNewQty("1");
-                        }}
-                      >
-                        + 추가
-                      </button>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        );
-      })}
       {pendingDelete !== null && (
         <ConfirmModal
           onConfirm={() => pendingDelete()}
