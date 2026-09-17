@@ -30,6 +30,12 @@
   color: #1a1a1a;
 }
 
+.scheduledBadge {
+  font-size: 12px;
+  font-weight: 400;
+  color: #4CAF50;
+}
+
 .deleteBtn {
   background: none;
   border: none;
