@@ -2,7 +2,6 @@ package com.example.seori_back.schedule.service;
 
 import com.example.seori_back.global.exception.CustomException;
 import com.example.seori_back.global.exception.ErrorCode;
-import com.example.seori_back.schedule.domain.entity.ScheduleAssignment;
 import com.example.seori_back.schedule.domain.entity.ScheduleVote;
 import com.example.seori_back.schedule.domain.entity.ScheduleWeek;
 import com.example.seori_back.schedule.domain.entity.WeekStatusEnum;
@@ -14,11 +13,12 @@ import com.example.seori_back.schedule.dto.response.ScheduleAssignmentResponseDt
 import com.example.seori_back.schedule.dto.response.ScheduleVoteResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleWeekDetailResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleWeekResponseDto;
-import com.example.seori_back.schedule.repository.ScheduleAssignmentRepository;
 import com.example.seori_back.schedule.repository.ScheduleVoteRepository;
 import com.example.seori_back.schedule.repository.ScheduleWeekRepository;
 import com.example.seori_back.user.domain.entity.User;
 import com.example.seori_back.user.repository.UserRepository;
+import com.example.seori_back.workShift.domain.entity.WorkShift;
+import com.example.seori_back.workShift.repository.WorkShiftRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ public class ScheduleService {
 
     private final ScheduleWeekRepository scheduleWeekRepository;
     private final ScheduleVoteRepository scheduleVoteRepository;
-    private final ScheduleAssignmentRepository scheduleAssignmentRepository;
+    private final WorkShiftRepository workShiftRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -46,7 +46,7 @@ public class ScheduleService {
     public ScheduleWeekDetailResponseDto getWeekDetail(Long weekId) {
         ScheduleWeek week = findWeek(weekId);
         List<ScheduleVote> votes = scheduleVoteRepository.findByWeekId(weekId);
-        List<ScheduleAssignment> assignments = scheduleAssignmentRepository.findByWeekId(weekId);
+        List<WorkShift> assignments = workShiftRepository.findByWeekId(weekId);
         return ScheduleWeekDetailResponseDto.from(week, votes, assignments);
     }
 
@@ -84,16 +84,16 @@ public class ScheduleService {
             throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
         }
 
-        scheduleAssignmentRepository.deleteByWeekId(weekId);
+        workShiftRepository.deleteByWeekId(weekId);
 
-        List<ScheduleAssignment> assignments = request.assignments().stream()
+        List<WorkShift> assignments = request.assignments().stream()
                 .map(item -> {
                     User user = userRepository.findById(item.userId())
                             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-                    return ScheduleAssignment.create(week, user, item.workDate());
+                    return WorkShift.createScheduled(user, week, item.workDate());
                 })
                 .toList();
-        scheduleAssignmentRepository.saveAll(assignments);
+        workShiftRepository.saveAll(assignments);
 
         week.confirm();
         return ScheduleWeekResponseDto.from(week);
@@ -128,7 +128,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public List<ScheduleAssignmentResponseDto> getAssignments(Long weekId) {
         findWeek(weekId);
-        return scheduleAssignmentRepository.findByWeekId(weekId).stream()
+        return workShiftRepository.findByWeekId(weekId).stream()
                 .map(ScheduleAssignmentResponseDto::from)
                 .toList();
     }
