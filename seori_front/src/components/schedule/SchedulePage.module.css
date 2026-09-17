@@ -150,6 +150,38 @@
   background: #a83030;
 }
 
+/* ── 탭 ── */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: #aaa;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.activeTab {
+  color: #c0392b;
+  border-bottom: 2px solid #c0392b;
+}
+
+/* ── 달력 탭 월 네비게이션 ── */
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
 /* ── 주차 네비게이션 ── */
 .weekNav {
   display: flex;

@@ -1,21 +1,22 @@
 import { useState } from "react";
-import type { WorkRecordResponse } from "../../api/workRecord";
-import { deleteWorkRecordAPI } from "../../api/workRecord";
+import type { WorkShiftResponse } from "../../api/workShift";
+import { deleteWorkShiftAPI } from "../../api/workShift";
 import WorkRecordModal from "./WorkRecordModal";
 import styles from "./WageSummary.module.css";
 
 interface Props {
-  records: WorkRecordResponse[];
+  records: WorkShiftResponse[];
   onRefresh: () => void;
 }
 
 export default function WageSummary({ records, onRefresh }: Props) {
-  const [modalRecord, setModalRecord] = useState<WorkRecordResponse | null>(
+  const [modalRecord, setModalRecord] = useState<WorkShiftResponse | null>(
     null,
   );
-  const totalRegularMinutes = records.reduce((s, r) => s + r.regularMinutes, 0);
-  const totalOvertimeMinutes = records.reduce((s, r) => s + r.overtimeMinutes, 0);
-  const totalWage = records.reduce((s, r) => s + r.totalWage, 0);
+  const workedRecords = records.filter((r) => r.startTime !== null);
+  const totalRegularMinutes = workedRecords.reduce((s, r) => s + r.regularMinutes, 0);
+  const totalOvertimeMinutes = workedRecords.reduce((s, r) => s + r.overtimeMinutes, 0);
+  const totalWage = workedRecords.reduce((s, r) => s + r.totalWage, 0);
 
   const fmt = (min: number) => `${Math.floor(min / 60)}H ${min % 60}M`;
   const fmtWage = (w: number) => w.toLocaleString("ko-KR") + "원";
@@ -40,10 +41,10 @@ export default function WageSummary({ records, onRefresh }: Props) {
       </div>
 
       <div className={styles.list}>
-        {records.length === 0 && (
+        {workedRecords.length === 0 && (
           <p className={styles.empty}>이번 달 근무 기록이 없습니다.</p>
         )}
-        {records.map((r) => (
+        {workedRecords.map((r) => (
           <button
             key={r.id}
             className={styles.card}
@@ -81,7 +82,7 @@ export default function WageSummary({ records, onRefresh }: Props) {
             onRefresh();
           }}
           onDelete={async () => {
-            await deleteWorkRecordAPI(modalRecord.id);
+            await deleteWorkShiftAPI(modalRecord.id);
             onRefresh();
           }}
         />

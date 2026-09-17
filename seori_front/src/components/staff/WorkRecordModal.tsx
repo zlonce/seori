@@ -1,11 +1,11 @@
 import { useState } from "react";
-import type { WorkRecordResponse } from "../../api/workRecord";
-import { createWorkRecordAPI, updateWorkRecordAPI } from "../../api/workRecord";
+import type { WorkShiftResponse } from "../../api/workShift";
+import { createWorkShiftAPI, updateWorkShiftAPI } from "../../api/workShift";
 import styles from "./WorkRecordModal.module.css";
 
 interface Props {
   date: string;
-  record?: WorkRecordResponse;
+  record?: WorkShiftResponse;
   onClose: () => void;
   onSaved: () => void;
   onDelete?: () => Promise<void>;
@@ -51,9 +51,9 @@ export default function WorkRecordModal({
     setError("");
     try {
       if (record) {
-        await updateWorkRecordAPI(record.id, { startTime, endTime });
+        await updateWorkShiftAPI(record.id, { startTime, endTime });
       } else {
-        await createWorkRecordAPI({ workDate: date, startTime, endTime });
+        await createWorkShiftAPI({ workDate: date, startTime, endTime });
       }
       onSaved();
       onClose();
@@ -68,7 +68,12 @@ export default function WorkRecordModal({
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.titleRow}>
-          <h3 className={styles.title}>{date} 근무 기록</h3>
+          <h3 className={styles.title}>
+            {date} 근무 기록
+            {record && record.startTime === null && (
+              <span className={styles.scheduledBadge}> (예정)</span>
+            )}
+          </h3>
           {record && onDelete && (
             <button
               className={styles.deleteBtn}

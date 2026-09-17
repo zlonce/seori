@@ -19,11 +19,12 @@ public enum ErrorCode {
     INVALID_TOKEN_TYPE(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰 타입입니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다."),
 
-    // WorkRecord
-    WORK_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 근무 기록입니다."),
-    FORBIDDEN_WORK_RECORD(HttpStatus.FORBIDDEN, "본인의 근무 기록만 수정할 수 있습니다."),
+    // WorkShift
+    WORK_SHIFT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 근무 기록입니다."),
+    FORBIDDEN_WORK_SHIFT(HttpStatus.FORBIDDEN, "본인의 근무 기록만 수정할 수 있습니다."),
     INVALID_WORK_TIME_NULL(HttpStatus.BAD_REQUEST, "시작/종료 시간은 null일 수 없습니다."),
     INVALID_WORK_TIME(HttpStatus.BAD_REQUEST, "종료 시간이 시작 시간보다 이전입니다."),
+    FUTURE_WORK_DATE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "아직 지나지 않은 날짜에는 근무 시간을 입력할 수 없습니다."),
 
     // SpecialDay
     SPECIAL_DAY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 특정일입니다."),

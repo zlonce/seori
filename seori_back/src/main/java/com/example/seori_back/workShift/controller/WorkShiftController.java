@@ -1,9 +1,9 @@
-package com.example.seori_back.workRecord.controller;
+package com.example.seori_back.workShift.controller;
 
-import com.example.seori_back.workRecord.dto.request.CreateWorkRecordRequestDto;
-import com.example.seori_back.workRecord.dto.request.UpdateWorkRecordRequestDto;
-import com.example.seori_back.workRecord.dto.response.WorkRecordResponseDto;
-import com.example.seori_back.workRecord.service.WorkRecordService;
+import com.example.seori_back.workShift.dto.request.CreateWorkShiftRequestDto;
+import com.example.seori_back.workShift.dto.request.UpdateWorkShiftRequestDto;
+import com.example.seori_back.workShift.dto.response.WorkShiftResponseDto;
+import com.example.seori_back.workShift.service.WorkShiftService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,49 +22,49 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/work-records")
+@RequestMapping("/api/work-shifts")
 @RequiredArgsConstructor
-public class WorkRecordController {
+public class WorkShiftController {
 
-    private final WorkRecordService workRecordService;
+    private final WorkShiftService workShiftService;
 
     @GetMapping("/my")
-    public ResponseEntity<List<WorkRecordResponseDto>> getMyRecords(
+    public ResponseEntity<List<WorkShiftResponseDto>> getMyShifts(
             @AuthenticationPrincipal String userId,
             @RequestParam int year,
             @RequestParam int month) {
-        return ResponseEntity.ok(workRecordService.getMyRecords(userId, year, month));
+        return ResponseEntity.ok(workShiftService.getMyShifts(userId, year, month));
     }
 
     @GetMapping("/staff/{staffId}")
     @PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
-    public ResponseEntity<List<WorkRecordResponseDto>> getStaffRecords(
+    public ResponseEntity<List<WorkShiftResponseDto>> getStaffShifts(
             @PathVariable String staffId,
             @RequestParam int year,
             @RequestParam int month) {
-        return ResponseEntity.ok(workRecordService.getStaffRecords(staffId, year, month));
+        return ResponseEntity.ok(workShiftService.getStaffShifts(staffId, year, month));
     }
 
     @PostMapping
-    public ResponseEntity<WorkRecordResponseDto> create(
+    public ResponseEntity<WorkShiftResponseDto> create(
             @AuthenticationPrincipal String userId,
-            @RequestBody @Valid CreateWorkRecordRequestDto request) {
-        return ResponseEntity.ok(workRecordService.create(userId, request));
+            @RequestBody @Valid CreateWorkShiftRequestDto request) {
+        return ResponseEntity.ok(workShiftService.create(userId, request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WorkRecordResponseDto> update(
+    public ResponseEntity<WorkShiftResponseDto> update(
             @AuthenticationPrincipal String userId,
             @PathVariable Long id,
-            @RequestBody @Valid UpdateWorkRecordRequestDto request) {
-        return ResponseEntity.ok(workRecordService.update(userId, id, request));
+            @RequestBody @Valid UpdateWorkShiftRequestDto request) {
+        return ResponseEntity.ok(workShiftService.update(userId, id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @AuthenticationPrincipal String userId,
             @PathVariable Long id) {
-        workRecordService.delete(userId, id);
+        workShiftService.delete(userId, id);
         return ResponseEntity.ok().build();
     }
 }

@@ -10,6 +10,8 @@ import {
   type ScheduleWeekDetail,
 } from "../../api/schedule";
 import { getStaffListAPI, type StaffSummary } from "../../api/user";
+import { getMyWorkShiftsAPI, type WorkShiftResponse } from "../../api/workShift";
+import { getSpecialDaysAPI } from "../../api/specialDay";
 import {
   DAY_KO,
   DEFAULT_BUSINESS_DAYS,
@@ -26,12 +28,55 @@ import CreateWeekForm from "./CreateWeekForm";
 import VotingView from "./VotingView";
 import ClosedView from "./ClosedView";
 import ConfirmedView from "./ConfirmedView";
+import WorkCalendar from "../staff/WorkCalendar";
 import styles from "./SchedulePage.module.css";
+
+type Tab = "weekly" | "calendar";
 
 export default function SchedulePage() {
   const { user } = useAuth();
   const isManagerOrAbove = user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
+  const showCalendarTab = user?.role === "ROLE_STAFF" || user?.role === "ROLE_MANAGER";
   const myId = user?.userId ?? "";
+
+  const [tab, setTab] = useState<Tab>("weekly");
+
+  const today = new Date();
+  const [calYear, setCalYear] = useState(today.getFullYear());
+  const [calMonth, setCalMonth] = useState(today.getMonth() + 1);
+  const [calRecords, setCalRecords] = useState<WorkShiftResponse[]>([]);
+  const [calSpecialDates, setCalSpecialDates] = useState<Set<string>>(new Set());
+  const [calLoading, setCalLoading] = useState(false);
+
+  const fetchCalendarData = async () => {
+    setCalLoading(true);
+    try {
+      const [recs, specials] = await Promise.all([
+        getMyWorkShiftsAPI(calYear, calMonth),
+        getSpecialDaysAPI(calYear, calMonth),
+      ]);
+      setCalRecords(recs);
+      setCalSpecialDates(new Set(specials.map((s) => s.date)));
+    } catch {
+      showError("근무 달력을 불러오지 못했습니다.");
+    } finally {
+      setCalLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "calendar") fetchCalendarData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, calYear, calMonth]);
+
+  const prevCalMonth = () => {
+    if (calMonth === 1) { setCalYear((y) => y - 1); setCalMonth(12); }
+    else setCalMonth((m) => m - 1);
+  };
+  const nextCalMonth = () => {
+    if (calMonth === 12) { setCalYear((y) => y + 1); setCalMonth(1); }
+    else setCalMonth((m) => m + 1);
+  };
 
   const cacheRef = useRef<Map<number, ScheduleWeekDetail>>(new Map());
   const activeWeekIdRef = useRef<number | null>(null);
@@ -177,10 +222,61 @@ export default function SchedulePage() {
     }
   };
 
+  const tabBar = showCalendarTab && (
+    <div className={styles.tabs}>
+      <button
+        className={`${styles.tab} ${tab === "weekly" ? styles.activeTab : ""}`}
+        onClick={() => setTab("weekly")}
+      >
+        주간
+      </button>
+      <button
+        className={`${styles.tab} ${tab === "calendar" ? styles.activeTab : ""}`}
+        onClick={() => setTab("calendar")}
+      >
+        달력
+      </button>
+    </div>
+  );
+
+  if (tab === "calendar" && showCalendarTab) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2 className={styles.title}>일정</h2>
+        </div>
+        {tabBar}
+        {errorMsg && <p className={styles.waitMsg}>{errorMsg}</p>}
+        <div className={styles.monthNav}>
+          <button className={styles.navBtn} onClick={prevCalMonth}>
+            <ChevronLeft size={20} />
+          </button>
+          <span className={styles.weekRange}>{calYear}년 {calMonth}월</span>
+          <button className={styles.navBtn} onClick={nextCalMonth}>
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        {calLoading ? (
+          <p className={styles.waitMsg}>불러오는 중...</p>
+        ) : (
+          <WorkCalendar
+            year={calYear}
+            month={calMonth}
+            records={calRecords}
+            specialDates={calSpecialDates}
+            onRefresh={fetchCalendarData}
+            restrictToScheduled={user?.role === "ROLE_STAFF"}
+          />
+        )}
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className={styles.container}>
         <h2 className={styles.title}>일정</h2>
+        {tabBar}
         <p className={styles.waitMsg}>불러오는 중...</p>
       </div>
     );
@@ -200,6 +296,7 @@ export default function SchedulePage() {
             </button>
           )}
         </div>
+        {tabBar}
         {showCreateForm && (
           <CreateWeekForm
             nextWeekStart={nextWeekStart}
@@ -230,6 +327,8 @@ export default function SchedulePage() {
           </button>
         )}
       </div>
+
+      {tabBar}
 
       {errorMsg && <p className={styles.waitMsg}>{errorMsg}</p>}
 
