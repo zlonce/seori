@@ -85,6 +85,7 @@ public class ScheduleService {
         }
 
         workShiftRepository.deleteByWeekId(weekId);
+        workShiftRepository.flush();
 
         List<WorkShift> assignments = request.assignments().stream()
                 .map(item -> {
