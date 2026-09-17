@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -46,6 +47,7 @@ public class WorkShiftService {
 
     @Transactional
     public WorkShiftResponseDto create(String userId, CreateWorkShiftRequestDto request) {
+        validateNotFutureDate(request.workDate());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         boolean isSpecial = specialDayService.isSpecialDate(request.workDate());
@@ -59,6 +61,7 @@ public class WorkShiftService {
     @Transactional
     public WorkShiftResponseDto update(String userId, Long shiftId, UpdateWorkShiftRequestDto request) {
         WorkShift shift = findOwnShift(userId, shiftId);
+        validateNotFutureDate(shift.getWorkDate());
         User user = shift.getUser();
         boolean isSpecial = specialDayService.isSpecialDate(shift.getWorkDate());
         WageCalculator.WageResult wage = wageCalculator.calculate(request.startTime(), request.endTime(), user.getHourlyWage(), user.getOvertimeWage(), isSpecial);
@@ -71,6 +74,12 @@ public class WorkShiftService {
     public void delete(String userId, Long shiftId) {
         WorkShift shift = findOwnShift(userId, shiftId);
         workShiftRepository.delete(shift);
+    }
+
+    private void validateNotFutureDate(LocalDate workDate) {
+        if (workDate.isAfter(LocalDate.now())) {
+            throw new CustomException(ErrorCode.FUTURE_WORK_DATE_NOT_ALLOWED);
+        }
     }
 
     private WorkShift findOwnShift(String userId, Long shiftId) {
