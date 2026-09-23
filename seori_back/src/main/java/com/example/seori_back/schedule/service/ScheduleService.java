@@ -113,6 +113,7 @@ public class ScheduleService {
     // 해당 (유저, 날짜)에 WorkShift가 아직 없는 경우에만 예정 row를 새로 만든다.
     private void createMissingShifts(ScheduleWeek week, List<AssignmentItem> items) {
         List<WorkShift> toCreate = items.stream()
+                .distinct()
                 .filter(item -> workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate()).isEmpty())
                 .map(item -> {
                     User user = userRepository.findById(item.userId())
