@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getStaffWorkRecordsAPI } from "../../api/workRecord";
+import { getStaffWorkShiftsAPI } from "../../api/workShift";
 import type { StaffSummary, UserRole } from "../../api/user";
 import styles from "./OwnerDashboard.module.css";
 
@@ -28,7 +28,7 @@ export default function WageTab({ staffList }: Props) {
     setWageLoading(true);
     try {
       const records = await Promise.all(
-        staffList.map((s) => getStaffWorkRecordsAPI(s.userId, wageYear, wageMonth)),
+        staffList.map((s) => getStaffWorkShiftsAPI(s.userId, wageYear, wageMonth)),
       );
       setWageData(
         staffList.map((s, i) => ({

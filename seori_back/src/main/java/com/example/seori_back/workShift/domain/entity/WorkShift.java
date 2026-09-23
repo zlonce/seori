@@ -1,5 +1,6 @@
-package com.example.seori_back.workRecord.domain.entity;
+package com.example.seori_back.workShift.domain.entity;
 
+import com.example.seori_back.schedule.domain.entity.ScheduleWeek;
 import com.example.seori_back.user.domain.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,10 +20,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "work_records")
+@Table(
+    name = "work_shifts",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "work_date"})
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class WorkRecord {
+public class WorkShift {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +36,15 @@ public class WorkRecord {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "week_id")
+    private ScheduleWeek week;
+
     @Column(nullable = false)
     private LocalDate workDate;
 
-    @Column(nullable = false)
     private LocalTime startTime;
 
-    @Column(nullable = false)
     private LocalTime endTime;
 
     private boolean specialDay;
@@ -50,20 +57,28 @@ public class WorkRecord {
 
     private int overtimeWage;
 
-    public static WorkRecord create(User user, LocalDate workDate, LocalTime startTime, LocalTime endTime,
+    public static WorkShift create(User user, LocalDate workDate, LocalTime startTime, LocalTime endTime,
                                     boolean specialDay, int regularMinutes, int overtimeMinutes,
                                     int regularWage, int overtimeWage) {
-        WorkRecord record = new WorkRecord();
-        record.user = user;
-        record.workDate = workDate;
-        record.startTime = startTime;
-        record.endTime = endTime;
-        record.specialDay = specialDay;
-        record.regularMinutes = regularMinutes;
-        record.overtimeMinutes = overtimeMinutes;
-        record.regularWage = regularWage;
-        record.overtimeWage = overtimeWage;
-        return record;
+        WorkShift shift = new WorkShift();
+        shift.user = user;
+        shift.workDate = workDate;
+        shift.startTime = startTime;
+        shift.endTime = endTime;
+        shift.specialDay = specialDay;
+        shift.regularMinutes = regularMinutes;
+        shift.overtimeMinutes = overtimeMinutes;
+        shift.regularWage = regularWage;
+        shift.overtimeWage = overtimeWage;
+        return shift;
+    }
+
+    public static WorkShift createScheduled(User user, ScheduleWeek week, LocalDate workDate) {
+        WorkShift shift = new WorkShift();
+        shift.user = user;
+        shift.week = week;
+        shift.workDate = workDate;
+        return shift;
     }
 
     public void update(LocalTime startTime, LocalTime endTime,

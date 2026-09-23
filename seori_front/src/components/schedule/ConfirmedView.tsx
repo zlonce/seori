@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { confirmScheduleAPI } from "../../api/schedule";
+import { updateAssignmentsAPI } from "../../api/schedule";
 import type { ScheduleWeekDetail } from "../../api/schedule";
 import type { StaffSummary } from "../../api/user";
 import { DAY_KO, formatShort } from "./scheduleUtils";
@@ -53,12 +53,21 @@ export default function ConfirmedView({
   };
 
   const handleSaveConfirmedEdit = async () => {
-    const assignments = Array.from(draftAssign).map((key) => {
+    const toItem = (key: string) => {
       const [userId, workDate] = key.split(":");
       return { userId, workDate };
-    });
+    };
+    const originalKeys = new Set(
+      currentDetail.assignments.map((a) => `${a.userId}:${a.workDate}`),
+    );
+    const add = Array.from(draftAssign)
+      .filter((key) => !originalKeys.has(key))
+      .map(toItem);
+    const remove = Array.from(originalKeys)
+      .filter((key) => !draftAssign.has(key))
+      .map(toItem);
     try {
-      await confirmScheduleAPI(currentDetail.id, assignments);
+      await updateAssignmentsAPI(currentDetail.id, add, remove);
       await onRefreshDetail();
       setEditingConfirmed(false);
     } catch {
