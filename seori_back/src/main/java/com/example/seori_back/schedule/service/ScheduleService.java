@@ -25,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -99,7 +101,6 @@ public class ScheduleService {
             throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
         }
 
-        // 아직 시간 미입력(예정) 상태인 것만 제거. 이미 실제 시간이 입력된 row는 보존한다.
         request.remove().forEach(item ->
                 workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate())
                         .filter(w -> w.getStartTime() == null)
@@ -110,10 +111,11 @@ public class ScheduleService {
         return ScheduleWeekResponseDto.from(week);
     }
 
-    // 해당 (유저, 날짜)에 WorkShift가 아직 없는 경우에만 예정 row를 새로 만든다.
     private void createMissingShifts(ScheduleWeek week, List<AssignmentItem> items) {
-        List<WorkShift> toCreate = items.stream()
-                .distinct()
+        List<AssignmentItem> distinctItems = items.stream().distinct().toList();
+        distinctItems.forEach(item -> validateBusinessDate(week, item.workDate()));
+
+        List<WorkShift> toCreate = distinctItems.stream()
                 .filter(item -> workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate()).isEmpty())
                 .map(item -> {
                     User user = userRepository.findById(item.userId())
@@ -122,6 +124,14 @@ public class ScheduleService {
                 })
                 .toList();
         workShiftRepository.saveAll(toCreate);
+    }
+
+    private void validateBusinessDate(ScheduleWeek week, LocalDate date) {
+        long offset = ChronoUnit.DAYS.between(week.getWeekStartDate(), date);
+        boolean[] businessDays = week.getBusinessDaysAsArray();
+        if (offset < 0 || offset > 6 || !businessDays[(int) offset]) {
+            throw new CustomException(ErrorCode.INVALID_ASSIGNMENT_DATE);
+        }
     }
 
     @Transactional(readOnly = true)
