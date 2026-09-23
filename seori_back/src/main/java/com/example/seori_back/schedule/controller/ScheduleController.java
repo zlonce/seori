@@ -1,8 +1,9 @@
 package com.example.seori_back.schedule.controller;
 
-import com.example.seori_back.schedule.dto.request.ConfirmScheduleRequestDto;
+import com.example.seori_back.schedule.dto.request.AssignmentsRequestDto;
 import com.example.seori_back.schedule.dto.request.CreateScheduleWeekRequestDto;
 import com.example.seori_back.schedule.dto.request.SaveVotesRequestDto;
+import com.example.seori_back.schedule.dto.request.UpdateAssignmentsRequestDto;
 import com.example.seori_back.schedule.dto.request.UpdateBusinessDaysRequestDto;
 import com.example.seori_back.schedule.dto.response.ScheduleAssignmentResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleVoteResponseDto;
@@ -67,8 +68,16 @@ public class ScheduleController {
     @PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
     public ResponseEntity<ScheduleWeekResponseDto> confirm(
             @PathVariable Long weekId,
-            @RequestBody @Valid ConfirmScheduleRequestDto request) {
+            @RequestBody @Valid AssignmentsRequestDto request) {
         return ResponseEntity.ok(scheduleService.confirm(weekId, request));
+    }
+
+    @PatchMapping("/{weekId}/assignments")
+    @PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
+    public ResponseEntity<ScheduleWeekResponseDto> updateAssignments(
+            @PathVariable Long weekId,
+            @RequestBody @Valid UpdateAssignmentsRequestDto request) {
+        return ResponseEntity.ok(scheduleService.updateAssignments(weekId, request));
     }
 
     @GetMapping("/{weekId}/votes")

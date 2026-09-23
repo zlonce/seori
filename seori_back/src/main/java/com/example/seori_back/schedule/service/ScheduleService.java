@@ -5,9 +5,11 @@ import com.example.seori_back.global.exception.ErrorCode;
 import com.example.seori_back.schedule.domain.entity.ScheduleVote;
 import com.example.seori_back.schedule.domain.entity.ScheduleWeek;
 import com.example.seori_back.schedule.domain.entity.WeekStatusEnum;
-import com.example.seori_back.schedule.dto.request.ConfirmScheduleRequestDto;
+import com.example.seori_back.schedule.dto.request.AssignmentItem;
+import com.example.seori_back.schedule.dto.request.AssignmentsRequestDto;
 import com.example.seori_back.schedule.dto.request.CreateScheduleWeekRequestDto;
 import com.example.seori_back.schedule.dto.request.SaveVotesRequestDto;
+import com.example.seori_back.schedule.dto.request.UpdateAssignmentsRequestDto;
 import com.example.seori_back.schedule.dto.request.UpdateBusinessDaysRequestDto;
 import com.example.seori_back.schedule.dto.response.ScheduleAssignmentResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleVoteResponseDto;
@@ -78,26 +80,47 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleWeekResponseDto confirm(Long weekId, ConfirmScheduleRequestDto request) {
+    public ScheduleWeekResponseDto confirm(Long weekId, AssignmentsRequestDto request) {
         ScheduleWeek week = findWeek(weekId);
-        if (week.getStatus() == WeekStatusEnum.VOTING) {
+        if (week.getStatus() != WeekStatusEnum.CLOSED) {
             throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
         }
 
-        workShiftRepository.deleteByWeekId(weekId);
-        workShiftRepository.flush();
+        createMissingShifts(week, request.assignments());
 
-        List<WorkShift> assignments = request.assignments().stream()
+        week.confirm();
+        return ScheduleWeekResponseDto.from(week);
+    }
+
+    @Transactional
+    public ScheduleWeekResponseDto updateAssignments(Long weekId, UpdateAssignmentsRequestDto request) {
+        ScheduleWeek week = findWeek(weekId);
+        if (week.getStatus() != WeekStatusEnum.CONFIRMED) {
+            throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
+        }
+
+        // 아직 시간 미입력(예정) 상태인 것만 제거. 이미 실제 시간이 입력된 row는 보존한다.
+        request.remove().forEach(item ->
+                workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate())
+                        .filter(w -> w.getStartTime() == null)
+                        .ifPresent(workShiftRepository::delete));
+
+        createMissingShifts(week, request.add());
+
+        return ScheduleWeekResponseDto.from(week);
+    }
+
+    // 해당 (유저, 날짜)에 WorkShift가 아직 없는 경우에만 예정 row를 새로 만든다.
+    private void createMissingShifts(ScheduleWeek week, List<AssignmentItem> items) {
+        List<WorkShift> toCreate = items.stream()
+                .filter(item -> workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate()).isEmpty())
                 .map(item -> {
                     User user = userRepository.findById(item.userId())
                             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
                     return WorkShift.createScheduled(user, week, item.workDate());
                 })
                 .toList();
-        workShiftRepository.saveAll(assignments);
-
-        week.confirm();
-        return ScheduleWeekResponseDto.from(week);
+        workShiftRepository.saveAll(toCreate);
     }
 
     @Transactional(readOnly = true)
