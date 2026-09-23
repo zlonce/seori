@@ -29,6 +29,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -115,11 +118,23 @@ public class ScheduleService {
         List<AssignmentItem> distinctItems = items.stream().distinct().toList();
         distinctItems.forEach(item -> validateBusinessDate(week, item.workDate()));
 
+        List<String> userIds = distinctItems.stream().map(AssignmentItem::userId).distinct().toList();
+        List<LocalDate> workDates = distinctItems.stream().map(AssignmentItem::workDate).distinct().toList();
+
+        Set<AssignmentItem> existing = workShiftRepository.findByUserIdInAndWorkDateIn(userIds, workDates).stream()
+                .map(w -> new AssignmentItem(w.getUser().getUserId(), w.getWorkDate()))
+                .collect(Collectors.toSet());
+
+        Map<String, User> userById = userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getUserId, user -> user));
+
         List<WorkShift> toCreate = distinctItems.stream()
-                .filter(item -> workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate()).isEmpty())
+                .filter(item -> !existing.contains(item))
                 .map(item -> {
-                    User user = userRepository.findById(item.userId())
-                            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                    User user = userById.get(item.userId());
+                    if (user == null) {
+                        throw new CustomException(ErrorCode.USER_NOT_FOUND);
+                    }
                     return WorkShift.createScheduled(user, week, item.workDate());
                 })
                 .toList();
