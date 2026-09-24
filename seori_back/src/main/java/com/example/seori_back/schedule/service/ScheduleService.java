@@ -116,6 +116,9 @@ public class ScheduleService {
 
     private void createMissingShifts(ScheduleWeek week, List<AssignmentItem> items) {
         List<AssignmentItem> distinctItems = items.stream().distinct().toList();
+        if (distinctItems.isEmpty()) {
+            return;
+        }
         distinctItems.forEach(item -> validateBusinessDate(week, item.workDate()));
 
         List<String> userIds = distinctItems.stream().map(AssignmentItem::userId).distinct().toList();
