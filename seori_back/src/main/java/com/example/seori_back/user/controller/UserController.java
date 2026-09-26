@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +37,7 @@ public class UserController {
 	}
 
 	@GetMapping("/staff")
-	@PreAuthorize("hasRole('OWNER')")
+	@PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
 	public ResponseEntity<List<StaffSummaryResponseDto>> getStaffList() {
 		return ResponseEntity.ok(userService.getStaffList());
 	}
@@ -53,7 +53,7 @@ public class UserController {
 
 	@PatchMapping("/password")
 	public ResponseEntity<Void> changePassword(
-		@AuthenticationPrincipal String userId,
+		@RequestAttribute String userId,
 		@RequestBody @Valid ChangePasswordRequestDto request) {
 		userService.changePassword(userId, request);
 		return ResponseEntity.ok().build();

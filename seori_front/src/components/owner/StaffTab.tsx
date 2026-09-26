@@ -15,13 +15,11 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
     role: UserRole;
     hourlyWage: number;
     overtimeWage: number;
-    password: string;
   }>({
     name: "",
     role: "STAFF",
     hourlyWage: 0,
     overtimeWage: 0,
-    password: "",
   });
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createForm, setCreateForm] = useState({
@@ -29,7 +27,6 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
     name: "",
     hourlyWage: 0,
     overtimeWage: 0,
-    password: "",
   });
 
   const startEdit = (s: StaffSummary) => {
@@ -39,13 +36,11 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
       role: s.role,
       hourlyWage: s.hourlyWage,
       overtimeWage: s.overtimeWage,
-      password: "",
     });
   };
 
   const saveEdit = async (userId: string) => {
-    const { password, ...rest } = editForm;
-    await updateStaffProfileAPI(userId, password ? editForm : rest);
+    await updateStaffProfileAPI(userId, editForm);
     setEditingId(null);
     onRefresh();
   };
@@ -53,7 +48,7 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
   const handleCreateStaff = async () => {
     await createUserAPI({ ...createForm, role: "STAFF" });
     setShowCreateForm(false);
-    setCreateForm({ phone: "", name: "", hourlyWage: 0, overtimeWage: 0, password: "" });
+    setCreateForm({ phone: "", name: "", hourlyWage: 0, overtimeWage: 0 });
     onRefresh();
   };
 
@@ -76,13 +71,6 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
             value={createForm.phone}
             onChange={(v) => setCreateForm((f) => ({ ...f, phone: v }))}
             placeholder="01012345678"
-          />
-          <InputRow
-            label="비밀번호"
-            value={createForm.password}
-            onChange={(v) => setCreateForm((f) => ({ ...f, password: v }))}
-            type="password"
-            placeholder="4~20자"
           />
           <InputRow
             label="기본시급"
@@ -142,13 +130,6 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
                 value={String(editForm.overtimeWage)}
                 onChange={(v) => setEditForm((f) => ({ ...f, overtimeWage: Number(v) }))}
                 type="number"
-              />
-              <InputRow
-                label="비밀번호"
-                value={editForm.password}
-                onChange={(v) => setEditForm((f) => ({ ...f, password: v }))}
-                type="password"
-                placeholder="변경할 때만 입력 (4~20자)"
               />
               <div className={styles.btnRow}>
                 <button className={styles.cancelBtn} onClick={() => setEditingId(null)}>

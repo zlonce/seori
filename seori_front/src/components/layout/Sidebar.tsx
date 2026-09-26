@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X, Calendar, Megaphone, FileText, Package, LayoutDashboard } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import PasswordChangeModal from "../common/PasswordChangeModal";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
@@ -20,7 +18,6 @@ const menuItems = [
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const dashboardPath =
     user?.role === "ROLE_OWNER" ? "/dashboard/owner" : "/dashboard/staff";
@@ -60,16 +57,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </button>
           ))}
         </nav>
-        <button
-          className={styles.passwordLink}
-          onClick={() => setShowPasswordModal(true)}
-        >
-          비밀번호 변경
-        </button>
       </div>
-      {showPasswordModal && (
-        <PasswordChangeModal onClose={() => setShowPasswordModal(false)} />
-      )}
     </>
   );
 }

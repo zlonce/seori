@@ -4,13 +4,11 @@ import com.example.seori_back.user.domain.entity.UserRoleEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 
 public record CreateUserRequestDto(
         @NotBlank String phone,
         @NotBlank String name,
         @NotNull UserRoleEnum role,
         @Positive int hourlyWage,
-        @Positive int overtimeWage,
-        @NotBlank @Size(min = 4, max = 20) String password
+        @Positive int overtimeWage
 ) {}

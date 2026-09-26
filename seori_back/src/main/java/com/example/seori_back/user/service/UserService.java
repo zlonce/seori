@@ -40,7 +40,7 @@ public class UserService {
             throw new CustomException(ErrorCode.DUPLICATE_USER_ID);
         }
 
-        String encoded = passwordEncoder.encode(request.password());
+        String encoded = passwordEncoder.encode(userId);
         User user = User.create(userId, encoded, request.phone(), request.name(), request.role(), request.hourlyWage(), request.overtimeWage());
         userRepository.save(user);
     }
@@ -97,10 +97,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.updateProfile(request.name(), request.role(), request.hourlyWage(), request.overtimeWage());
-
-        if (request.password() != null && !request.password().isBlank()) {
-            user.changePassword(passwordEncoder.encode(request.password()));
-        }
     }
 
     @Transactional
