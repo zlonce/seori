@@ -82,6 +82,7 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
             value={createForm.password}
             onChange={(v) => setCreateForm((f) => ({ ...f, password: v }))}
             type="password"
+            placeholder="4~20자"
           />
           <InputRow
             label="기본시급"
@@ -147,7 +148,7 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
                 value={editForm.password}
                 onChange={(v) => setEditForm((f) => ({ ...f, password: v }))}
                 type="password"
-                placeholder="변경할 때만 입력"
+                placeholder="변경할 때만 입력 (4~20자)"
               />
               <div className={styles.btnRow}>
                 <button className={styles.cancelBtn} onClick={() => setEditingId(null)}>

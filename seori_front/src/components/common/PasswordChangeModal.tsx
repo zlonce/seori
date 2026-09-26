@@ -19,7 +19,7 @@ export default function PasswordChangeModal({ onClose }: Props) {
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("새 비밀번호가 일치하지 않습니다");
+      setError("새 비밀번호 확인이 일치하지 않습니다");
       return;
     }
 
@@ -56,6 +56,7 @@ export default function PasswordChangeModal({ onClose }: Props) {
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="4~20자"
           />
         </div>
         <div className={styles.field}>
@@ -65,6 +66,7 @@ export default function PasswordChangeModal({ onClose }: Props) {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="4~20자"
           />
         </div>
 
