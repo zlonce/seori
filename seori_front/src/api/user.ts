@@ -14,8 +14,10 @@ export interface StaffSummary {
 export const getStaffListAPI = () =>
   client.get<StaffSummary[]>("/users/staff").then((r) => r.data);
 
-export const updateStaffProfileAPI = (userId: string, data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number }) =>
-  client.patch(`/users/${userId}/profile`, data);
+export const updateStaffProfileAPI = (
+  userId: string,
+  data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; password?: string },
+) => client.patch(`/users/${userId}/profile`, data);
 
 export const createUserAPI = (data: {
   phone: string;
@@ -23,4 +25,5 @@ export const createUserAPI = (data: {
   role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
+  password: string;
 }) => client.post("/users", data);
