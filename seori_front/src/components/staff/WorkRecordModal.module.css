@@ -36,23 +36,6 @@
   color: #4CAF50;
 }
 
-.deleteBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: var(--color-text-faint);
-  display: flex;
-  align-items: center;
-  border-radius: var(--radius-xs);
-  transition: color var(--transition-fast), background var(--transition-fast);
-}
-
-.deleteBtn:hover {
-  color: #e53935;
-  background: #fff0f0;
-}
-
 .timeRow {
   display: flex;
   align-items: flex-end;

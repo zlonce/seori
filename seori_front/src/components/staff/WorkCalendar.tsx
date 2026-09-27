@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { WorkShiftResponse } from "../../api/workShift";
-import { deleteWorkShiftAPI } from "../../api/workShift";
 
 import WorkRecordModal from "./WorkRecordModal";
 import styles from "./WorkCalendar.module.css";
@@ -74,21 +73,6 @@ export default function WorkCalendar({
     setModalDate(dateStr);
   };
 
-  const handleDelete = async (
-    e: React.MouseEvent,
-    record: WorkShiftResponse,
-  ) => {
-    e.stopPropagation();
-    if (!confirm("삭제하시겠습니까?")) return;
-    try {
-      await deleteWorkShiftAPI(record.id);
-      onRefresh();
-    } catch {
-      setToast("삭제에 실패했습니다.");
-      setTimeout(() => setToast(""), 2500);
-    }
-  };
-
   return (
     <div>
       {toast && (
@@ -121,14 +105,6 @@ export default function WorkCalendar({
                 opacity: isFuture ? 0.5 : 1,
               }}
               onClick={() => handleCellClick(day)}
-              onContextMenu={
-                record
-                  ? (e) => {
-                      e.preventDefault();
-                      handleDelete(e, record);
-                    }
-                  : undefined
-              }
             >
               <span
                 className={styles.dayNum}
@@ -172,7 +148,6 @@ export default function WorkCalendar({
           record={editRecord}
           onClose={() => setModalDate(null)}
           onSaved={onRefresh}
-          onDelete={editRecord ? async () => { await deleteWorkShiftAPI(editRecord.id); onRefresh(); } : undefined}
         />
       )}
     </div>

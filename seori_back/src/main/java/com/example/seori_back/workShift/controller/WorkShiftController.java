@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,13 +57,5 @@ public class WorkShiftController {
             @PathVariable Long id,
             @RequestBody @Valid UpdateWorkShiftRequestDto request) {
         return ResponseEntity.ok(workShiftService.update(userId, id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal String userId,
-            @PathVariable Long id) {
-        workShiftService.delete(userId, id);
-        return ResponseEntity.ok().build();
     }
 }

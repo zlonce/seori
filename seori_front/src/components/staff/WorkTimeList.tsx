@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { WorkShiftResponse } from "../../api/workShift";
-import { deleteWorkShiftAPI } from "../../api/workShift";
 import WorkRecordModal from "./WorkRecordModal";
 import styles from "./WorkTimeList.module.css";
 
@@ -51,11 +50,6 @@ export default function WorkTimeList({ records, onRefresh }: Props) {
           record={editRecord}
           onClose={() => setEditRecord(null)}
           onSaved={() => {
-            setEditRecord(null);
-            onRefresh();
-          }}
-          onDelete={async () => {
-            await deleteWorkShiftAPI(editRecord.id);
             setEditRecord(null);
             onRefresh();
           }}

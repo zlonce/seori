@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { WorkShiftResponse } from "../../api/workShift";
-import { deleteWorkShiftAPI } from "../../api/workShift";
 import WorkRecordModal from "./WorkRecordModal";
 import styles from "./WageSummary.module.css";
 
@@ -79,10 +78,6 @@ export default function WageSummary({ records, onRefresh }: Props) {
           onClose={() => setModalRecord(null)}
           onSaved={() => {
             setModalRecord(null);
-            onRefresh();
-          }}
-          onDelete={async () => {
-            await deleteWorkShiftAPI(modalRecord.id);
             onRefresh();
           }}
         />

@@ -8,7 +8,6 @@ interface Props {
   record?: WorkShiftResponse;
   onClose: () => void;
   onSaved: () => void;
-  onDelete?: () => Promise<void>;
 }
 
 const DEFAULT_START = "18:30";
@@ -19,7 +18,6 @@ export default function WorkRecordModal({
   record,
   onClose,
   onSaved,
-  onDelete,
 }: Props) {
   const [startTime, setStartTime] = useState(
     record?.startTime ?? DEFAULT_START,
@@ -27,20 +25,6 @@ export default function WorkRecordModal({
   const [endTime, setEndTime] = useState(record?.endTime ?? DEFAULT_END);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const handleDelete = async () => {
-    if (!onDelete) return;
-    if (!confirm("이 근무 기록을 삭제하시겠습니까?")) return;
-    setLoading(true);
-    try {
-      await onDelete();
-      onClose();
-    } catch {
-      setError("삭제에 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSave = async () => {
     if (startTime >= endTime) {
@@ -74,30 +58,6 @@ export default function WorkRecordModal({
               <span className={styles.scheduledBadge}> (예정)</span>
             )}
           </h3>
-          {record && onDelete && (
-            <button
-              className={styles.deleteBtn}
-              onClick={handleDelete}
-              disabled={loading}
-              title="삭제"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                <path d="M10 11v6M14 11v6" />
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-              </svg>
-            </button>
-          )}
         </div>
 
         <div className={styles.timeRow}>
