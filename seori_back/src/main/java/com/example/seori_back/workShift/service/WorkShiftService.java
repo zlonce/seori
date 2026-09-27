@@ -70,12 +70,6 @@ public class WorkShiftService {
         return WorkShiftResponseDto.from(shift);
     }
 
-    @Transactional
-    public void delete(String userId, Long shiftId) {
-        WorkShift shift = findOwnShift(userId, shiftId);
-        workShiftRepository.delete(shift);
-    }
-
     private void validateNotFutureDate(LocalDate workDate) {
         if (workDate.isAfter(LocalDate.now())) {
             throw new CustomException(ErrorCode.FUTURE_WORK_DATE_NOT_ALLOWED);

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { WorkShiftResponse } from "../../api/workShift";
-import { deleteWorkShiftAPI } from "../../api/workShift";
 
 import WorkRecordModal from "./WorkRecordModal";
 import styles from "./WorkCalendar.module.css";
@@ -17,7 +16,7 @@ interface Props {
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 const COMPLETED_COLOR = "#d65c5c";
-const SCHEDULED_COLOR = "#4CAF50";
+const SCHEDULED_COLOR = "#a7d65c";
 
 export default function WorkCalendar({
   year,
@@ -74,21 +73,6 @@ export default function WorkCalendar({
     setModalDate(dateStr);
   };
 
-  const handleDelete = async (
-    e: React.MouseEvent,
-    record: WorkShiftResponse,
-  ) => {
-    e.stopPropagation();
-    if (!confirm("삭제하시겠습니까?")) return;
-    try {
-      await deleteWorkShiftAPI(record.id);
-      onRefresh();
-    } catch {
-      setToast("삭제에 실패했습니다.");
-      setTimeout(() => setToast(""), 2500);
-    }
-  };
-
   return (
     <div>
       {toast && (
@@ -121,14 +105,6 @@ export default function WorkCalendar({
                 opacity: isFuture ? 0.5 : 1,
               }}
               onClick={() => handleCellClick(day)}
-              onContextMenu={
-                record
-                  ? (e) => {
-                      e.preventDefault();
-                      handleDelete(e, record);
-                    }
-                  : undefined
-              }
             >
               <span
                 className={styles.dayNum}
@@ -158,7 +134,7 @@ export default function WorkCalendar({
         </div>
         <div className={styles.legendItem}>
           <div className={styles.legendDot} style={{ background: SCHEDULED_COLOR }} />
-          <span>예정</span>
+          <span>근무예정</span>
         </div>
         <div className={styles.legendItem}>
           <span className={styles.legendSpecial}>날짜</span>
@@ -172,7 +148,6 @@ export default function WorkCalendar({
           record={editRecord}
           onClose={() => setModalDate(null)}
           onSaved={onRefresh}
-          onDelete={editRecord ? async () => { await deleteWorkShiftAPI(editRecord.id); onRefresh(); } : undefined}
         />
       )}
     </div>

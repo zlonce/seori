@@ -35,6 +35,3 @@ export const createWorkShiftAPI = (data: CreateWorkShiftRequest) =>
 
 export const updateWorkShiftAPI = (id: number, data: UpdateWorkShiftRequest) =>
   client.put<WorkShiftResponse>(`/work-shifts/${id}`, data).then((r) => r.data);
-
-export const deleteWorkShiftAPI = (id: number) =>
-  client.delete(`/work-shifts/${id}`);
