@@ -20,7 +20,7 @@ export default function WorkTimeList({ records, onRefresh }: Props) {
   return (
     <div className={styles.section}>
       <button className={styles.toggle} onClick={() => setExpanded((v) => !v)}>
-        <span>근무 시간 목록</span>
+        <span>근무 목록</span>
         <span className={styles.toggleArrow}>{expanded ? "▲" : "▼"}</span>
       </button>
 
