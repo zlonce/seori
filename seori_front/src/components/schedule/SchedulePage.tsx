@@ -59,6 +59,7 @@ export default function SchedulePage() {
       setCalRecords(recs);
       setCalSpecialDates(new Set(specials.map((s) => s.date)));
     } catch {
+      setCalRecords([]);
       showError("근무 달력을 불러오지 못했습니다.");
     } finally {
       setCalLoading(false);
