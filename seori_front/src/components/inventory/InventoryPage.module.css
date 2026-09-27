@@ -18,25 +18,25 @@
 
 .editBtn {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 5px 14px;
   font-size: 13px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .editBtnActive {
-  border-color: #4a90e2;
-  color: #4a90e2;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .section {
   margin-bottom: 12px;
   background: #fff;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 .sectionHeaderRow {
@@ -70,28 +70,28 @@
 
 .sectionQtyEditBtn {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .sectionQtyEditBtn:hover {
-  border-color: #4a90e2;
-  color: #4a90e2;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .sectionQtyEditBtnActive {
-  border-color: #4a90e2;
-  color: #4a90e2;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .sectionDeleteBtn {
   background: none;
   border: none;
-  color: #ccc;
+  color: var(--color-text-faint);
   font-size: 12px;
   cursor: pointer;
   padding: 4px 12px;
@@ -99,13 +99,13 @@
 }
 
 .sectionDeleteBtn:hover {
-  color: #e74c3c;
+  color: var(--color-error);
 }
 
 .sectionLabel {
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
   flex: 1;
 }
 
@@ -130,7 +130,7 @@
 
 .itemName {
   font-size: 15px;
-  color: #333;
+  color: var(--color-text);
 }
 
 .itemRight {
@@ -140,21 +140,21 @@
 }
 
 .qtyText {
-  background: #f5f5f5;
-  border-radius: 6px;
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-xs);
   padding: 5px 18px;
   font-size: 16px;
   font-weight: 600;
   min-width: 48px;
-  color: #333;
+  color: var(--color-text);
   text-align: center;
   display: inline-block;
 }
 
 .qtyEditInput {
   width: 64px;
-  border: 2px solid #4a90e2;
-  border-radius: 6px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-xs);
   padding: 5px 8px;
   font-size: 16px;
   font-weight: 600;
@@ -163,21 +163,21 @@
 }
 
 .qtyEditInput::placeholder {
-  color: #bbb;
+  color: var(--color-text-faint);
   font-weight: 400;
 }
 
 .deleteBtn {
   background: none;
   border: none;
-  color: #ccc;
+  color: var(--color-text-faint);
   font-size: 12px;
   cursor: pointer;
   padding: 4px;
 }
 
 .deleteBtn:hover {
-  color: #e74c3c;
+  color: var(--color-error);
 }
 
 .addItemBtn {
@@ -188,7 +188,7 @@
   padding: 12px 16px;
   text-align: left;
   font-size: 13px;
-  color: #4a90e2;
+  color: var(--color-primary);
   cursor: pointer;
 }
 
@@ -205,20 +205,20 @@
 }
 
 .nameInput {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 9px 12px;
   font-size: 14px;
   outline: none;
 }
 
 .nameInput:focus {
-  border-color: #4a90e2;
+  border-color: var(--color-primary);
 }
 
 .qtyInput {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 9px 12px;
   font-size: 14px;
   outline: none;
@@ -226,7 +226,7 @@
 }
 
 .qtyInput:focus {
-  border-color: #4a90e2;
+  border-color: var(--color-primary);
 }
 
 .formBtns {
@@ -237,19 +237,19 @@
 
 .cancelBtn {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 6px 14px;
   font-size: 13px;
   cursor: pointer;
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 .saveBtn {
-  background: #4a90e2;
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 6px 14px;
   font-size: 13px;
   cursor: pointer;
@@ -263,11 +263,11 @@
   width: 100%;
   background: none;
   border: 1px dashed #d0d0d0;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 12px 16px;
   text-align: center;
   font-size: 13px;
-  color: #4a90e2;
+  color: var(--color-primary);
   cursor: pointer;
 }
 
@@ -277,8 +277,8 @@
 
 .addSectionForm {
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
@@ -287,17 +287,17 @@
 
 .empty {
   text-align: center;
-  color: #aaa;
+  color: var(--color-text-light);
   font-size: 14px;
   padding: 32px 0;
 }
 
 .errorMsg {
-  color: #e74c3c;
+  color: var(--color-error);
   font-size: 13px;
   text-align: center;
   padding: 8px 12px;
   background: #fff0f0;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   margin-bottom: 12px;
 }

@@ -5,12 +5,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: var(--z-overlay);
 }
 
 .modal {
   background: #fff;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   padding: 28px 24px 20px;
   width: 260px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
@@ -22,7 +22,7 @@
 
 .message {
   font-size: 15px;
-  color: #333;
+  color: var(--color-text);
   margin: 0;
   text-align: center;
 }
@@ -36,12 +36,12 @@
 .cancelBtn {
   flex: 1;
   padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  background: #f5f5f5;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
   font-size: 14px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .cancelBtn:hover {
@@ -51,14 +51,14 @@
 .confirmBtn {
   flex: 1;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: none;
-  background: #e74c3c;
+  background: var(--color-error);
   color: #fff;
   font-size: 14px;
   cursor: pointer;
 }
 
 .confirmBtn:hover {
-  background: #c0392b;
+  background: var(--color-primary);
 }
