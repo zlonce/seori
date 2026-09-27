@@ -17,7 +17,7 @@ interface Props {
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
 const COMPLETED_COLOR = "#d65c5c";
-const SCHEDULED_COLOR = "#4CAF50";
+const SCHEDULED_COLOR = "#a7d65c";
 
 export default function WorkCalendar({
   year,
@@ -158,7 +158,7 @@ export default function WorkCalendar({
         </div>
         <div className={styles.legendItem}>
           <div className={styles.legendDot} style={{ background: SCHEDULED_COLOR }} />
-          <span>예정</span>
+          <span>근무예정</span>
         </div>
         <div className={styles.legendItem}>
           <span className={styles.legendSpecial}>날짜</span>
