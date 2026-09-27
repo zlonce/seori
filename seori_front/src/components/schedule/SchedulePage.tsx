@@ -29,6 +29,7 @@ import VotingView from "./VotingView";
 import ClosedView from "./ClosedView";
 import ConfirmedView from "./ConfirmedView";
 import WorkCalendar from "../staff/WorkCalendar";
+import WorkTimeList from "../staff/WorkTimeList";
 import styles from "./SchedulePage.module.css";
 
 type Tab = "weekly" | "calendar";
@@ -259,14 +260,17 @@ export default function SchedulePage() {
         {calLoading ? (
           <p className={styles.waitMsg}>불러오는 중...</p>
         ) : (
-          <WorkCalendar
-            year={calYear}
-            month={calMonth}
-            records={calRecords}
-            specialDates={calSpecialDates}
-            onRefresh={fetchCalendarData}
-            restrictToScheduled={user?.role === "ROLE_STAFF"}
-          />
+          <>
+            <WorkCalendar
+              year={calYear}
+              month={calMonth}
+              records={calRecords}
+              specialDates={calSpecialDates}
+              onRefresh={fetchCalendarData}
+              restrictToScheduled={user?.role === "ROLE_STAFF"}
+            />
+            <WorkTimeList records={calRecords} onRefresh={fetchCalendarData} />
+          </>
         )}
       </div>
     );
