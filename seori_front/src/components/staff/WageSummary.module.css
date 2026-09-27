@@ -59,6 +59,7 @@
 
 .card {
   background: #fff;
+  border: none;
   border-radius: var(--radius-md);
   padding: 12px 16px;
   display: flex;
@@ -66,6 +67,9 @@
   align-items: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font: inherit;
 }
 
 .card:hover {
