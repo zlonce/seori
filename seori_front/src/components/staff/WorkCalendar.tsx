@@ -16,7 +16,7 @@ interface Props {
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-const COMPLETED_COLOR = "#2196F3";
+const COMPLETED_COLOR = "#d65c5c";
 const SCHEDULED_COLOR = "#4CAF50";
 
 export default function WorkCalendar({
@@ -96,14 +96,8 @@ export default function WorkCalendar({
       )}
 
       <div className={styles.dayHeader}>
-        {DAY_LABELS.map((d, i) => (
-          <div
-            key={d}
-            className={styles.dayLabel}
-            style={{
-              color: i === 0 ? "#e53935" : i === 6 ? "#1976D2" : "#666",
-            }}
-          >
+        {DAY_LABELS.map((d) => (
+          <div key={d} className={styles.dayLabel}>
             {d}
           </div>
         ))}
@@ -117,8 +111,6 @@ export default function WorkCalendar({
           const isSpecial = specialDates.has(dateStr);
           const isToday = todayStr === dateStr;
           const isFuture = dateStr > todayStr;
-          const isSun = idx % 7 === 0;
-          const isSat = idx % 7 === 6;
 
           return (
             <button
@@ -145,11 +137,7 @@ export default function WorkCalendar({
                     ? "#e53935"
                     : record
                       ? "#fff"
-                      : isSun
-                        ? "#e53935"
-                        : isSat
-                          ? "#1976D2"
-                          : "#1a1a1a",
+                      : "#1a1a1a",
                   fontWeight: isSpecial || record ? 700 : 400,
                   background: record
                     ? (record.startTime ? COMPLETED_COLOR : SCHEDULED_COLOR) + "CC"

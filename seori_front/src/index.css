@@ -1,4 +1,29 @@
-/* 전역 CSS 리셋 */
+:root {
+  --color-primary: #c0392b;
+  --color-primary-hover: #a83030;
+  --color-error: #e74c3c;
+  --color-text: #333;
+  --color-text-secondary: #666;
+  --color-text-muted: #888;
+  --color-text-light: #aaa;
+  --color-text-faint: #bbb;
+  --color-border: #e0e0e0;
+  --color-bg-subtle: #f5f5f5;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+  --z-overlay: 100;
+  --z-sidebar: 101;
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -17,8 +42,8 @@ body {
     Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text);
 }
 
 #root {
@@ -55,10 +80,10 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c94444;
-  border-radius: 4px;
+  background: var(--color-primary);
+  border-radius: var(--radius-xs);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a83030;
+  background: var(--color-primary-hover);
 }

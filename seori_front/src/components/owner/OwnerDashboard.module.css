@@ -1,6 +1,6 @@
 .tabs {
   display: flex;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--color-bg-subtle);
   margin-bottom: 16px;
 }
 
@@ -10,34 +10,34 @@
   background: none;
   border: none;
   font-size: 15px;
-  color: #aaa;
+  color: var(--color-text-light);
   cursor: pointer;
   font-weight: 600;
 }
 
 .activeTab {
-  color: #c0392b;
-  border-bottom: 2px solid #c0392b;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
 }
 
 .addBtn {
   width: 100%;
   padding: 12px;
-  border-radius: 10px;
-  border: 2px dashed #e0e0e0;
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--color-border);
   background: #fff;
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-muted);
   cursor: pointer;
   margin-bottom: 12px;
 }
 
 .createCard {
   background: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 .cardTitle {
@@ -48,10 +48,10 @@
 
 .staffCard {
   background: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 16px;
   margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 .staffName {
@@ -62,7 +62,7 @@
 
 .staffPhone {
   font-size: 12px;
-  color: #aaa;
+  color: var(--color-text-light);
   margin-top: 2px;
 }
 
@@ -84,15 +84,15 @@
 .fieldLabel {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 4px;
 }
 
 .select {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
   font-size: 14px;
   outline: none;
 }
@@ -106,20 +106,20 @@
 .cancelBtn {
   flex: 1;
   padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
   background: #fff;
   font-size: 14px;
   cursor: pointer;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .saveBtn {
   flex: 1;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: none;
-  background: #c0392b;
+  background: var(--color-primary);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -128,12 +128,12 @@
 
 .editBtn {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 4px 10px;
   font-size: 12px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 /* 추가수당일 */
@@ -153,7 +153,7 @@
 
 .checkboxLabel {
   font-size: 13px;
-  color: #555;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -161,9 +161,9 @@
 
 .smallAddBtn {
   padding: 6px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: none;
-  background: #c0392b;
+  background: var(--color-primary);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -173,8 +173,8 @@
 .dateInput {
   flex: 0 0 140px;
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
   font-size: 13px;
   outline: none;
 }
@@ -182,8 +182,8 @@
 .nameInput {
   flex: 1;
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
   font-size: 13px;
   outline: none;
 }
@@ -193,7 +193,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-bg-subtle);
 }
 
 .specialDate {
@@ -216,14 +216,14 @@
   font-size: 10px;
   color: #1976d2;
   border: 1px solid #1976d2;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   padding: 1px 5px;
 }
 
 .deleteBtn {
   background: none;
   border: 1px solid #ffcdd2;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 4px 10px;
   font-size: 12px;
   color: #e53935;
@@ -232,7 +232,7 @@
 
 .empty {
   text-align: center;
-  color: #bbb;
+  color: var(--color-text-faint);
   font-size: 14px;
   margin-top: 32px;
 }
@@ -248,12 +248,12 @@
 
 .monthNavBtn {
   background: none;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 4px 12px;
   font-size: 16px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .monthLabel {
@@ -266,10 +266,10 @@
 
 .wageCard {
   background: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 14px 16px;
   margin-bottom: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 .wageHeader {
@@ -287,9 +287,9 @@
 
 .roleBadge {
   font-size: 11px;
-  color: #888;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 1px 6px;
 }
 
@@ -312,12 +312,12 @@
 
 .wageLabel {
   font-size: 12px;
-  color: #aaa;
+  color: var(--color-text-light);
 }
 
 .wageAmount {
   font-size: 13px;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .wageTotalRow {
@@ -325,19 +325,19 @@
   justify-content: space-between;
   align-items: baseline;
   padding-top: 8px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--color-bg-subtle);
 }
 
 .wageTotalLabel {
   font-size: 13px;
-  color: #888;
+  color: var(--color-text-muted);
   font-weight: 600;
 }
 
 .wageTotalAmount {
   font-size: 16px;
   font-weight: 700;
-  color: #c0392b;
+  color: var(--color-primary);
 }
 
 .grandTotal {
@@ -347,20 +347,20 @@
   margin-top: 6px;
   padding: 14px 16px;
   background: #fff8f8;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   border: 1px solid #ffcdd2;
 }
 
 .grandTotalLabel {
   font-size: 14px;
   font-weight: 600;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .grandTotalAmount {
   font-size: 18px;
   font-weight: 700;
-  color: #c0392b;
+  color: var(--color-primary);
 }
 
 /* InputRow */
@@ -371,15 +371,15 @@
 .inputRowLabel {
   display: block;
   font-size: 12px;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 4px;
 }
 
 .inputRowField {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
   font-size: 14px;
   box-sizing: border-box;
   outline: none;
