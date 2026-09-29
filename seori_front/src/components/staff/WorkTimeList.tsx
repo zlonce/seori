@@ -25,7 +25,7 @@ export default function WorkTimeList({ records, onRefresh }: Props) {
 
       {expanded && (
         completed.length === 0 ? (
-          <p className={styles.empty}>완료된 근무 기록이 없습니다.</p>
+          <p className={styles.empty}>저장된 근무 기록이 없습니다.</p>
         ) : (
           <div className={styles.list}>
             {completed.map((r) => (
