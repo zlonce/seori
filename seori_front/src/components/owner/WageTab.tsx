@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getStaffWorkShiftsAPI } from "../../api/workShift";
+import type { WorkShiftResponse } from "../../api/workShift";
 import type { StaffSummary } from "../../api/user";
+import StaffWageDetailModal from "./StaffWageDetailModal";
 import styles from "./OwnerDashboard.module.css";
 
 interface StaffWageData {
@@ -13,6 +15,7 @@ interface StaffWageData {
   regularWage: number;
   overtimeWage: number;
   totalWage: number;
+  records: WorkShiftResponse[];
 }
 
 const fmt = (min: number) => `${Math.floor(min / 60)}H ${min % 60}M`;
@@ -27,6 +30,7 @@ export default function WageTab({ staffList }: Props) {
   const [wageMonth, setWageMonth] = useState(now.getMonth() + 1);
   const [wageData, setWageData] = useState<StaffWageData[]>([]);
   const [wageLoading, setWageLoading] = useState(false);
+  const [selected, setSelected] = useState<StaffWageData | null>(null);
 
   const fetchWages = async () => {
     if (staffList.length === 0) return;
@@ -46,6 +50,7 @@ export default function WageTab({ staffList }: Props) {
           regularWage: records[i].reduce((sum, r) => sum + r.regularWage, 0),
           overtimeWage: records[i].reduce((sum, r) => sum + r.overtimeWage, 0),
           totalWage: records[i].reduce((sum, r) => sum + r.totalWage, 0),
+          records: records[i],
         })),
       );
     } finally {
@@ -82,7 +87,11 @@ export default function WageTab({ staffList }: Props) {
 
       {!wageLoading &&
         wageData.map((w) => (
-          <div key={w.userId} className={styles.wageCard}>
+          <div
+            key={w.userId}
+            className={styles.wageCard}
+            onClick={() => setSelected(w)}
+          >
             <div className={styles.wageHeader}>
               <span className={styles.wageName}>{w.name}</span>
             </div>
@@ -120,6 +129,14 @@ export default function WageTab({ staffList }: Props) {
             {wageData.reduce((sum, w) => sum + w.totalWage, 0).toLocaleString("ko-KR")}원
           </span>
         </div>
+      )}
+
+      {selected && (
+        <StaffWageDetailModal
+          name={selected.name}
+          records={selected.records}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   );
