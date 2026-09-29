@@ -270,32 +270,26 @@
   padding: 14px 16px;
   margin-bottom: 10px;
   box-shadow: var(--shadow-card);
+  cursor: pointer;
 }
 
 .wageHeader {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+.wageRate {
+  font-size: 12px;
+  color: var(--color-text-light);
+  margin-bottom: 8px;
 }
 
 .wageName {
   font-size: 16px;
   font-weight: 700;
   color: #1a1a1a;
-}
-
-.roleBadge {
-  font-size: 11px;
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xs);
-  padding: 1px 6px;
-}
-
-.roleBadgeManager {
-  color: #1976d2;
-  border-color: #1976d2;
 }
 
 .wageBreakdown {

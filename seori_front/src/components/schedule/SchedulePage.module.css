@@ -250,8 +250,8 @@
 }
 
 .badgeVoting {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .badgeClosed {
@@ -260,8 +260,8 @@
 }
 
 .badgeConfirmed {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: #fce8e8;
+  color: var(--color-primary);
 }
 
 /* ── 영업일 수정 버튼 (weekMeta 안) ── */
