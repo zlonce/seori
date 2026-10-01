@@ -55,6 +55,10 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
+        if (!user.isActive()) {
+            throw new CustomException(ErrorCode.INACTIVE_USER);
+        }
+
         String accessToken = jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
         String refreshToken = jwtUtil.generateRefreshToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
 
@@ -68,6 +72,10 @@ public class UserService {
         String userId = claims.get("userId", String.class);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!user.isActive()) {
+            throw new CustomException(ErrorCode.INACTIVE_USER);
+        }
 
         return jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
     }
