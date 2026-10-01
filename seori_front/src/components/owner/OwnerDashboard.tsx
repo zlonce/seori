@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getStaffListAPI } from "../../api/user";
-import type { StaffSummary } from "../../api/user";
+import type { Staff } from "../../api/user";
 import StaffTab from "./StaffTab";
 import WageTab from "./WageTab";
 import SpecialDaysTab from "./SpecialDaysTab";
@@ -10,7 +10,7 @@ type Tab = "staff" | "wage" | "specialDays";
 
 export default function OwnerDashboard() {
   const [tab, setTab] = useState<Tab>("staff");
-  const [staffList, setStaffList] = useState<StaffSummary[]>([]);
+  const [staffList, setStaffList] = useState<Staff[]>([]);
 
   const fetchStaff = () =>
     getStaffListAPI().then(setStaffList).catch(() => {});

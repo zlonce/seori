@@ -10,6 +10,7 @@ import com.example.seori_back.user.dto.request.CreateUserRequestDto;
 import com.example.seori_back.user.dto.request.LoginRequestDto;
 import com.example.seori_back.user.dto.request.UpdateStaffRequestDto;
 import com.example.seori_back.user.dto.response.LoginResponseDto;
+import com.example.seori_back.user.dto.response.StaffResponseDto;
 import com.example.seori_back.user.dto.response.StaffSummaryResponseDto;
 import com.example.seori_back.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -86,7 +87,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<StaffSummaryResponseDto> getStaffList() {
+    public List<StaffResponseDto> getStaffList() {
+        return userRepository.findByRoleIn(List.of(UserRoleEnum.STAFF, UserRoleEnum.MANAGER)).stream()
+                .map(StaffResponseDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<StaffSummaryResponseDto> getStaffSummaries() {
         return userRepository.findByRoleIn(List.of(UserRoleEnum.STAFF, UserRoleEnum.MANAGER)).stream()
                 .map(StaffSummaryResponseDto::from)
                 .toList();

@@ -10,6 +10,7 @@ interface Props {
   businessDates: Array<{ date: string; dayIdx: number }>;
   myId: string;
   isManagerOrAbove: boolean;
+  isOwner: boolean;
   onRefreshDetail: () => Promise<void>;
   onUpdateWeekInfo: (updated: ScheduleWeek) => void;
   onError: (msg: string) => void;
@@ -20,6 +21,7 @@ export default function VotingView({
   businessDates,
   myId,
   isManagerOrAbove,
+  isOwner,
   onRefreshDetail,
   onUpdateWeekInfo,
   onError,
@@ -72,7 +74,7 @@ export default function VotingView({
 
   return (
     <>
-      {!isManagerOrAbove && (
+      {!isOwner && (
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>내 투표</h3>
           <div className={styles.myVoteGrid}>

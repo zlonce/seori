@@ -9,7 +9,6 @@ import {
   type ScheduleWeek,
   type ScheduleWeekDetail,
 } from "../../api/schedule";
-import { getStaffListAPI, type StaffSummary } from "../../api/user";
 import { getMyWorkShiftsAPI, type WorkShiftResponse } from "../../api/workShift";
 import { getSpecialDaysAPI } from "../../api/specialDay";
 import {
@@ -37,6 +36,7 @@ type Tab = "weekly" | "calendar";
 export default function SchedulePage() {
   const { user } = useAuth();
   const isManagerOrAbove = user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
+  const isOwner = user?.role === "ROLE_OWNER";
   const showCalendarTab = user?.role === "ROLE_STAFF" || user?.role === "ROLE_MANAGER";
   const myId = user?.userId ?? "";
 
@@ -68,7 +68,6 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (tab === "calendar") fetchCalendarData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, calYear, calMonth]);
 
   const prevCalMonth = () => {
@@ -85,7 +84,6 @@ export default function SchedulePage() {
 
   const [weeks, setWeeks] = useState<ScheduleWeek[]>([]);
   const [currentDetail, setCurrentDetail] = useState<ScheduleWeekDetail | null>(null);
-  const [staffList, setStaffList] = useState<StaffSummary[]>([]);
 
   const [weekIdx, setWeekIdx] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -160,12 +158,8 @@ export default function SchedulePage() {
   useEffect(() => {
     const init = async () => {
       try {
-        const [fetchedWeeks, fetchedStaff] = await Promise.all([
-          getWeeksAPI(),
-          isManagerOrAbove ? getStaffListAPI() : Promise.resolve([]),
-        ]);
+        const fetchedWeeks = await getWeeksAPI();
         setWeeks(fetchedWeeks);
-        setStaffList(fetchedStaff);
         if (fetchedWeeks.length === 0) return;
 
         const recentWeeks = fetchedWeeks.slice(-PREFETCH_COUNT);
@@ -186,7 +180,6 @@ export default function SchedulePage() {
       }
     };
     init();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -194,7 +187,6 @@ export default function SchedulePage() {
     setEditingDays(false);
     setShowCreateForm(false);
     loadWeekDetail(week.id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [week?.id]);
 
   const handleSubmitCreate = async () => {
@@ -411,6 +403,7 @@ export default function SchedulePage() {
           businessDates={businessDates}
           myId={myId}
           isManagerOrAbove={isManagerOrAbove}
+          isOwner={isOwner}
           onRefreshDetail={() => refreshDetail(currentDetail.id)}
           onUpdateWeekInfo={updateCachedWeekInfo}
           onError={showError}
@@ -434,7 +427,6 @@ export default function SchedulePage() {
           businessDates={businessDates}
           myId={myId}
           isManagerOrAbove={isManagerOrAbove}
-          staffList={staffList}
           onRefreshDetail={() => refreshDetail(currentDetail.id)}
           onError={showError}
         />

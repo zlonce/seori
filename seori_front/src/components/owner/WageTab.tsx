@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getStaffWorkShiftsAPI } from "../../api/workShift";
 import type { WorkShiftResponse } from "../../api/workShift";
-import type { StaffSummary } from "../../api/user";
+import type { Staff } from "../../api/user";
 import StaffWageDetailModal from "./StaffWageDetailModal";
 import styles from "./OwnerDashboard.module.css";
 
@@ -21,7 +21,7 @@ interface StaffWageData {
 const fmt = (min: number) => `${Math.floor(min / 60)}H ${min % 60}M`;
 
 interface Props {
-  staffList: StaffSummary[];
+  staffList: Staff[];
 }
 
 export default function WageTab({ staffList }: Props) {
