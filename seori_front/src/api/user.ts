@@ -2,7 +2,7 @@ import client from "./client";
 
 export type UserRole = "STAFF" | "MANAGER";
 
-export interface StaffSummary {
+export interface Staff {
   userId: string;
   name: string;
   phone: string;
@@ -12,7 +12,7 @@ export interface StaffSummary {
 }
 
 export const getStaffListAPI = () =>
-  client.get<StaffSummary[]>("/users/staff").then((r) => r.data);
+  client.get<Staff[]>("/users/staff").then((r) => r.data);
 
 export const updateStaffProfileAPI = (
   userId: string,
