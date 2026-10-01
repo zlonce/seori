@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { updateAssignmentsAPI } from "../../api/schedule";
 import type { ScheduleWeekDetail } from "../../api/schedule";
-import type { StaffSummary } from "../../api/user";
+import type { Staff } from "../../api/user";
 import { DAY_KO, formatShort } from "./scheduleUtils";
 import VoteTable from "./VoteTable";
 import styles from "./SchedulePage.module.css";
@@ -11,7 +11,7 @@ interface Props {
   businessDates: Array<{ date: string; dayIdx: number }>;
   myId: string;
   isManagerOrAbove: boolean;
-  staffList: StaffSummary[];
+  staffList: Staff[];
   onRefreshDetail: () => Promise<void>;
   onError: (msg: string) => void;
 }

@@ -9,7 +9,7 @@ import {
   type ScheduleWeek,
   type ScheduleWeekDetail,
 } from "../../api/schedule";
-import { getStaffListAPI, type StaffSummary } from "../../api/user";
+import { getStaffListAPI, type Staff } from "../../api/user";
 import { getMyWorkShiftsAPI, type WorkShiftResponse } from "../../api/workShift";
 import { getSpecialDaysAPI } from "../../api/specialDay";
 import {
@@ -85,7 +85,7 @@ export default function SchedulePage() {
 
   const [weeks, setWeeks] = useState<ScheduleWeek[]>([]);
   const [currentDetail, setCurrentDetail] = useState<ScheduleWeekDetail | null>(null);
-  const [staffList, setStaffList] = useState<StaffSummary[]>([]);
+  const [staffList, setStaffList] = useState<Staff[]>([]);
 
   const [weekIdx, setWeekIdx] = useState(0);
   const [loading, setLoading] = useState(true);

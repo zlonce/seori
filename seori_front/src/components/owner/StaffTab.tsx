@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { updateStaffProfileAPI, createUserAPI } from "../../api/user";
-import type { StaffSummary, UserRole } from "../../api/user";
+import type { Staff, UserRole } from "../../api/user";
 import styles from "./OwnerDashboard.module.css";
 
 interface Props {
-  staffList: StaffSummary[];
+  staffList: Staff[];
   onRefresh: () => void;
 }
 
@@ -32,7 +32,7 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
     password: "",
   });
 
-  const startEdit = (s: StaffSummary) => {
+  const startEdit = (s: Staff) => {
     setEditingId(s.userId);
     setEditForm({
       name: s.name,
