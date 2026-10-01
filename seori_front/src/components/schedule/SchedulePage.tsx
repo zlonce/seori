@@ -9,7 +9,6 @@ import {
   type ScheduleWeek,
   type ScheduleWeekDetail,
 } from "../../api/schedule";
-import { getStaffListAPI, type Staff } from "../../api/user";
 import { getMyWorkShiftsAPI, type WorkShiftResponse } from "../../api/workShift";
 import { getSpecialDaysAPI } from "../../api/specialDay";
 import {
@@ -69,7 +68,6 @@ export default function SchedulePage() {
 
   useEffect(() => {
     if (tab === "calendar") fetchCalendarData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, calYear, calMonth]);
 
   const prevCalMonth = () => {
@@ -86,7 +84,6 @@ export default function SchedulePage() {
 
   const [weeks, setWeeks] = useState<ScheduleWeek[]>([]);
   const [currentDetail, setCurrentDetail] = useState<ScheduleWeekDetail | null>(null);
-  const [staffList, setStaffList] = useState<Staff[]>([]);
 
   const [weekIdx, setWeekIdx] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -161,12 +158,8 @@ export default function SchedulePage() {
   useEffect(() => {
     const init = async () => {
       try {
-        const [fetchedWeeks, fetchedStaff] = await Promise.all([
-          getWeeksAPI(),
-          isManagerOrAbove ? getStaffListAPI() : Promise.resolve([]),
-        ]);
+        const fetchedWeeks = await getWeeksAPI();
         setWeeks(fetchedWeeks);
-        setStaffList(fetchedStaff);
         if (fetchedWeeks.length === 0) return;
 
         const recentWeeks = fetchedWeeks.slice(-PREFETCH_COUNT);
@@ -194,7 +187,6 @@ export default function SchedulePage() {
     setEditingDays(false);
     setShowCreateForm(false);
     loadWeekDetail(week.id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [week?.id]);
 
   const handleSubmitCreate = async () => {
@@ -435,7 +427,6 @@ export default function SchedulePage() {
           businessDates={businessDates}
           myId={myId}
           isManagerOrAbove={isManagerOrAbove}
-          staffList={staffList}
           onRefreshDetail={() => refreshDetail(currentDetail.id)}
           onError={showError}
         />

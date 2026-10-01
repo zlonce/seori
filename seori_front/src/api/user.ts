@@ -14,6 +14,14 @@ export interface Staff {
 export const getStaffListAPI = () =>
   client.get<Staff[]>("/users/staff").then((r) => r.data);
 
+export interface StaffSummary {
+  userId: string;
+  name: string;
+}
+
+export const getStaffSummariesAPI = () =>
+  client.get<StaffSummary[]>("/users/staff/summary").then((r) => r.data);
+
 export const updateStaffProfileAPI = (
   userId: string,
   data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; password?: string },

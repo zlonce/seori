@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { updateAssignmentsAPI } from "../../api/schedule";
 import type { ScheduleWeekDetail } from "../../api/schedule";
-import type { Staff } from "../../api/user";
+import { getStaffSummariesAPI, type StaffSummary } from "../../api/user";
 import { DAY_KO, formatShort } from "./scheduleUtils";
 import VoteTable from "./VoteTable";
 import styles from "./SchedulePage.module.css";
@@ -11,7 +11,6 @@ interface Props {
   businessDates: Array<{ date: string; dayIdx: number }>;
   myId: string;
   isManagerOrAbove: boolean;
-  staffList: Staff[];
   onRefreshDetail: () => Promise<void>;
   onError: (msg: string) => void;
 }
@@ -21,13 +20,14 @@ export default function ConfirmedView({
   businessDates,
   myId,
   isManagerOrAbove,
-  staffList,
   onRefreshDetail,
   onError,
 }: Props) {
   const [editingConfirmed, setEditingConfirmed] = useState(false);
   const [draftAssign, setDraftAssign] = useState<Set<string>>(new Set());
   const [showVoteHistory, setShowVoteHistory] = useState(false);
+  const [staffList, setStaffList] = useState<StaffSummary[]>([]);
+  const [staffLoading, setStaffLoading] = useState(false);
 
   const votesFor = (date: string) =>
     currentDetail.votes.filter((v) => v.availableDate === date);
@@ -50,6 +50,13 @@ export default function ConfirmedView({
       new Set(currentDetail.assignments.map((a) => `${a.userId}:${a.workDate}`)),
     );
     setEditingConfirmed(true);
+    if (staffList.length === 0) {
+      setStaffLoading(true);
+      getStaffSummariesAPI()
+        .then(setStaffList)
+        .catch(() => onError("직원 목록을 불러오지 못했습니다."))
+        .finally(() => setStaffLoading(false));
+    }
   };
 
   const handleSaveConfirmedEdit = async () => {
@@ -115,7 +122,7 @@ export default function ConfirmedView({
         ) : (
           <>
             <p className={styles.assignHint}>
-              배정할 직원을 눌러 수정하세요. (투표하지 않은 직원도 배정 가능)
+              배정할 직원을 눌러 수정하세요.
             </p>
             <div className={styles.dateRows}>
               {businessDates.map(({ date, dayIdx }) => (
@@ -125,26 +132,30 @@ export default function ConfirmedView({
                     <span className={styles.daySmDate}>{formatShort(date)}</span>
                   </div>
                   <div className={styles.tagRow}>
-                    {[...staffList]
-                      .sort((a, b) => {
-                        const aVoted = votesFor(date).some((v) => v.userId === a.userId);
-                        const bVoted = votesFor(date).some((v) => v.userId === b.userId);
-                        return aVoted === bVoted ? 0 : aVoted ? -1 : 1;
-                      })
-                      .map((s) => {
-                        const on = draftAssign.has(`${s.userId}:${date}`);
-                        const voted = votesFor(date).some((v) => v.userId === s.userId);
-                        return (
-                          <button
-                            key={s.userId}
-                            className={`${styles.assignTag} ${on ? styles.assignTagOn : voted ? styles.assignTagVoted : ""}`}
-                            onClick={() => toggleDraft(s.userId, date)}
-                          >
-                            {s.name}
-                            {on && <span className={styles.check}> ✓</span>}
-                          </button>
-                        );
-                      })}
+                    {staffLoading ? (
+                      <span className={styles.restDay}>불러오는 중...</span>
+                    ) : (
+                      [...staffList]
+                        .sort((a, b) => {
+                          const aVoted = votesFor(date).some((v) => v.userId === a.userId);
+                          const bVoted = votesFor(date).some((v) => v.userId === b.userId);
+                          return aVoted === bVoted ? 0 : aVoted ? -1 : 1;
+                        })
+                        .map((s) => {
+                          const on = draftAssign.has(`${s.userId}:${date}`);
+                          const voted = votesFor(date).some((v) => v.userId === s.userId);
+                          return (
+                            <button
+                              key={s.userId}
+                              className={`${styles.assignTag} ${on ? styles.assignTagOn : voted ? styles.assignTagVoted : ""}`}
+                              onClick={() => toggleDraft(s.userId, date)}
+                            >
+                              {s.name}
+                              {on && <span className={styles.check}> ✓</span>}
+                            </button>
+                          );
+                        })
+                    )}
                   </div>
                 </div>
               ))}

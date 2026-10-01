@@ -17,6 +17,7 @@ import com.example.seori_back.user.dto.request.ChangePasswordRequestDto;
 import com.example.seori_back.user.dto.request.CreateUserRequestDto;
 import com.example.seori_back.user.dto.request.UpdateStaffRequestDto;
 import com.example.seori_back.user.dto.response.StaffResponseDto;
+import com.example.seori_back.user.dto.response.StaffSummaryResponseDto;
 import com.example.seori_back.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -40,6 +41,12 @@ public class UserController {
 	@PreAuthorize("hasRole('OWNER')")
 	public ResponseEntity<List<StaffResponseDto>> getStaffList() {
 		return ResponseEntity.ok(userService.getStaffList());
+	}
+
+	@GetMapping("/staff/summary")
+	@PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
+	public ResponseEntity<List<StaffSummaryResponseDto>> getStaffSummaries() {
+		return ResponseEntity.ok(userService.getStaffSummaries());
 	}
 
 	@PatchMapping("/{userId}/profile")
