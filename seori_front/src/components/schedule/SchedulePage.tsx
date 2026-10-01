@@ -37,6 +37,7 @@ type Tab = "weekly" | "calendar";
 export default function SchedulePage() {
   const { user } = useAuth();
   const isManagerOrAbove = user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
+  const isOwner = user?.role === "ROLE_OWNER";
   const showCalendarTab = user?.role === "ROLE_STAFF" || user?.role === "ROLE_MANAGER";
   const myId = user?.userId ?? "";
 
@@ -186,7 +187,6 @@ export default function SchedulePage() {
       }
     };
     init();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -411,6 +411,7 @@ export default function SchedulePage() {
           businessDates={businessDates}
           myId={myId}
           isManagerOrAbove={isManagerOrAbove}
+          isOwner={isOwner}
           onRefreshDetail={() => refreshDetail(currentDetail.id)}
           onUpdateWeekInfo={updateCachedWeekInfo}
           onError={showError}
