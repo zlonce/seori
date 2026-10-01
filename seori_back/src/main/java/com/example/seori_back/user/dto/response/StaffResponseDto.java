@@ -9,7 +9,8 @@ public record StaffResponseDto(
         String phone,
         UserRoleEnum role,
         int hourlyWage,
-        int overtimeWage
+        int overtimeWage,
+        boolean active
 ) {
     public static StaffResponseDto from(User user) {
         return new StaffResponseDto(
@@ -18,7 +19,8 @@ public record StaffResponseDto(
                 user.getPhone(),
                 user.getRole(),
                 user.getHourlyWage(),
-                user.getOvertimeWage()
+                user.getOvertimeWage(),
+                user.isActive()
         );
     }
 }

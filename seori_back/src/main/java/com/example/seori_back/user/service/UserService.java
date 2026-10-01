@@ -103,7 +103,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<StaffSummaryResponseDto> getStaffSummaries() {
-        return userRepository.findByRoleIn(List.of(UserRoleEnum.STAFF, UserRoleEnum.MANAGER)).stream()
+        return userRepository.findByRoleInAndActiveTrue(List.of(UserRoleEnum.STAFF, UserRoleEnum.MANAGER)).stream()
                 .map(StaffSummaryResponseDto::from)
                 .toList();
     }
