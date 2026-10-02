@@ -9,6 +9,7 @@ export interface Staff {
   role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
+  active: boolean;
 }
 
 export const getStaffListAPI = () =>
@@ -24,7 +25,7 @@ export const getStaffSummariesAPI = () =>
 
 export const updateStaffProfileAPI = (
   userId: string,
-  data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; password?: string },
+  data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; active: boolean; password?: string },
 ) => client.patch(`/users/${userId}/profile`, data);
 
 export const createUserAPI = (data: {

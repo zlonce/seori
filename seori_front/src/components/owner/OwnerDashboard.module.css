@@ -220,6 +220,14 @@
   padding: 1px 5px;
 }
 
+.inactiveBadge {
+  font-size: 10px;
+  color: #e53935;
+  border: 1px solid #e53935;
+  border-radius: var(--radius-xs);
+  padding: 1px 5px;
+}
+
 .deleteBtn {
   background: none;
   border: 1px solid #ffcdd2;

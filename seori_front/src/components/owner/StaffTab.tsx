@@ -15,12 +15,14 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
     role: UserRole;
     hourlyWage: number;
     overtimeWage: number;
+    active: boolean;
     password: string;
   }>({
     name: "",
     role: "STAFF",
     hourlyWage: 0,
     overtimeWage: 0,
+    active: true,
     password: "",
   });
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -37,6 +39,7 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
     setEditForm({
       name: s.name,
       role: s.role,
+      active: s.active,
       hourlyWage: s.hourlyWage,
       overtimeWage: s.overtimeWage,
       password: "",
@@ -109,7 +112,10 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
 
       {staffList.map((s) => (
         <div key={s.userId} className={styles.staffCard}>
-          <div className={styles.staffName}>{s.name}</div>
+          <div className={styles.staffName}>
+            {s.name}
+            {!s.active && <span className={styles.inactiveBadge}>비활성</span>}
+          </div>
 
           {editingId === s.userId ? (
             <div className={styles.editingWrap}>
@@ -150,6 +156,16 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
                 type="password"
                 placeholder="변경할 때만 입력 (4~20자)"
               />
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={editForm.active}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, active: e.target.checked }))
+                  }
+                />
+                &nbsp;활성 계정
+              </label>
               <div className={styles.btnRow}>
                 <button className={styles.cancelBtn} onClick={() => setEditingId(null)}>
                   취소
