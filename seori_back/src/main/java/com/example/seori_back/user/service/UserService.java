@@ -55,6 +55,10 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
+        if (!user.isActive()) {
+            throw new CustomException(ErrorCode.INACTIVE_USER);
+        }
+
         String accessToken = jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
         String refreshToken = jwtUtil.generateRefreshToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
 
@@ -68,6 +72,10 @@ public class UserService {
         String userId = claims.get("userId", String.class);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (!user.isActive()) {
+            throw new CustomException(ErrorCode.INACTIVE_USER);
+        }
 
         return jwtUtil.generateAccessToken(user.getPhone(), user.getUserId(), user.getRole().getAuthority());
     }
@@ -95,7 +103,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<StaffSummaryResponseDto> getStaffSummaries() {
-        return userRepository.findByRoleIn(List.of(UserRoleEnum.STAFF, UserRoleEnum.MANAGER)).stream()
+        return userRepository.findByRoleInAndActiveTrue(List.of(UserRoleEnum.STAFF, UserRoleEnum.MANAGER)).stream()
                 .map(StaffSummaryResponseDto::from)
                 .toList();
     }
@@ -105,6 +113,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.updateProfile(request.name(), request.role(), request.hourlyWage(), request.overtimeWage());
+
+        if (request.active() != null) {
+            if (request.active()) {
+                user.activate();
+            } else {
+                user.deactivate();
+            }
+        }
 
         if (request.password() != null && !request.password().isBlank()) {
             user.changePassword(passwordEncoder.encode(request.password()));

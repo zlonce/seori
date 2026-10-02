@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, String> {
     List<User> findByRoleIn(List<UserRoleEnum> roles);
+    List<User> findByRoleInAndActiveTrue(List<UserRoleEnum> roles);
     boolean existsById(String userId);
 }

@@ -12,6 +12,7 @@ public record UpdateStaffRequestDto(
         @NotNull UserRoleEnum role,
         @Positive int hourlyWage,
         @Positive int overtimeWage,
+        Boolean active,
         @Size(min = 4, max = 20) String password
 ) {
     @AssertTrue(message = "역할은 STAFF 또는 MANAGER만 설정할 수 있습니다.")

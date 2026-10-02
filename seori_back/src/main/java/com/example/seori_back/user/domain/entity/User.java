@@ -39,6 +39,9 @@ public class User {
     @Column(nullable = false)
     private int overtimeWage;
 
+    @Column(nullable = false)
+    private boolean active;
+
     public static User create(String userId, String encodedPassword, String phone, String name, UserRoleEnum role, int hourlyWage, int overtimeWage) {
         User user = new User();
         user.userId = userId;
@@ -48,6 +51,7 @@ public class User {
         user.role = role;
         user.hourlyWage = hourlyWage;
         user.overtimeWage = overtimeWage;
+        user.active = true;
         return user;
     }
 
@@ -60,5 +64,13 @@ public class User {
         this.role = role;
         this.hourlyWage = hourlyWage;
         this.overtimeWage = overtimeWage;
+    }
+
+    public void activate() {
+        this.active = true;
+    }
+
+    public void deactivate() {
+        this.active = false;
     }
 }
