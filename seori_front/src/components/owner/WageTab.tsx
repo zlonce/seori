@@ -40,18 +40,20 @@ export default function WageTab({ staffList }: Props) {
         staffList.map((s) => getStaffWorkShiftsAPI(s.userId, wageYear, wageMonth)),
       );
       setWageData(
-        staffList.map((s, i) => ({
-          userId: s.userId,
-          name: s.name,
-          hourlyRate: s.hourlyWage,
-          overtimeRate: s.overtimeWage,
-          regularMinutes: records[i].reduce((sum, r) => sum + r.regularMinutes, 0),
-          overtimeMinutes: records[i].reduce((sum, r) => sum + r.overtimeMinutes, 0),
-          regularWage: records[i].reduce((sum, r) => sum + r.regularWage, 0),
-          overtimeWage: records[i].reduce((sum, r) => sum + r.overtimeWage, 0),
-          totalWage: records[i].reduce((sum, r) => sum + r.totalWage, 0),
-          records: records[i],
-        })),
+        staffList
+          .map((s, i) => ({
+            userId: s.userId,
+            name: s.name,
+            hourlyRate: s.hourlyWage,
+            overtimeRate: s.overtimeWage,
+            regularMinutes: records[i].reduce((sum, r) => sum + r.regularMinutes, 0),
+            overtimeMinutes: records[i].reduce((sum, r) => sum + r.overtimeMinutes, 0),
+            regularWage: records[i].reduce((sum, r) => sum + r.regularWage, 0),
+            overtimeWage: records[i].reduce((sum, r) => sum + r.overtimeWage, 0),
+            totalWage: records[i].reduce((sum, r) => sum + r.totalWage, 0),
+            records: records[i],
+          }))
+          .filter((w) => w.totalWage > 0),
       );
     } finally {
       setWageLoading(false);
