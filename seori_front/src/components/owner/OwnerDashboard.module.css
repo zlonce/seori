@@ -226,6 +226,7 @@
   border: 1px solid #e53935;
   border-radius: var(--radius-xs);
   padding: 1px 5px;
+  margin-left: 6px;
 }
 
 .deleteBtn {

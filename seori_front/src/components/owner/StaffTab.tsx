@@ -9,6 +9,8 @@ interface Props {
 }
 
 export default function StaffTab({ staffList, onRefresh }: Props) {
+  const sortedStaffList = [...staffList].sort((a, b) => Number(b.active) - Number(a.active));
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{
     name: string;
@@ -110,7 +112,7 @@ export default function StaffTab({ staffList, onRefresh }: Props) {
         </div>
       )}
 
-      {staffList.map((s) => (
+      {sortedStaffList.map((s) => (
         <div key={s.userId} className={styles.staffCard}>
           <div className={styles.staffName}>
             {s.name}
