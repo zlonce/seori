@@ -114,10 +114,12 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.updateProfile(request.name(), request.role(), request.hourlyWage(), request.overtimeWage());
 
-        if (request.active()) {
-            user.activate();
-        } else {
-            user.deactivate();
+        if (request.active() != null) {
+            if (request.active()) {
+                user.activate();
+            } else {
+                user.deactivate();
+            }
         }
 
         if (request.password() != null && !request.password().isBlank()) {
