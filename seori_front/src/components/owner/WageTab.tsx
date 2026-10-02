@@ -32,34 +32,6 @@ export default function WageTab({ staffList }: Props) {
   const [wageLoading, setWageLoading] = useState(false);
   const [selected, setSelected] = useState<StaffWageData | null>(null);
 
-  const fetchWages = async () => {
-    if (staffList.length === 0) return;
-    setWageLoading(true);
-    try {
-      const records = await Promise.all(
-        staffList.map((s) => getStaffWorkShiftsAPI(s.userId, wageYear, wageMonth)),
-      );
-      setWageData(
-        staffList
-          .map((s, i) => ({
-            userId: s.userId,
-            name: s.name,
-            hourlyRate: s.hourlyWage,
-            overtimeRate: s.overtimeWage,
-            regularMinutes: records[i].reduce((sum, r) => sum + r.regularMinutes, 0),
-            overtimeMinutes: records[i].reduce((sum, r) => sum + r.overtimeMinutes, 0),
-            regularWage: records[i].reduce((sum, r) => sum + r.regularWage, 0),
-            overtimeWage: records[i].reduce((sum, r) => sum + r.overtimeWage, 0),
-            totalWage: records[i].reduce((sum, r) => sum + r.totalWage, 0),
-            records: records[i],
-          }))
-          .filter((w) => w.totalWage > 0),
-      );
-    } finally {
-      setWageLoading(false);
-    }
-  };
-
   const prevMonth = () => {
     if (wageMonth === 1) { setWageYear((y) => y - 1); setWageMonth(12); }
     else setWageMonth((m) => m - 1);
@@ -70,6 +42,33 @@ export default function WageTab({ staffList }: Props) {
   };
 
   useEffect(() => {
+    const fetchWages = async () => {
+      if (staffList.length === 0) return;
+      setWageLoading(true);
+      try {
+        const records = await Promise.all(
+          staffList.map((s) => getStaffWorkShiftsAPI(s.userId, wageYear, wageMonth)),
+        );
+        setWageData(
+          staffList
+            .map((s, i) => ({
+              userId: s.userId,
+              name: s.name,
+              hourlyRate: s.hourlyWage,
+              overtimeRate: s.overtimeWage,
+              regularMinutes: records[i].reduce((sum, r) => sum + r.regularMinutes, 0),
+              overtimeMinutes: records[i].reduce((sum, r) => sum + r.overtimeMinutes, 0),
+              regularWage: records[i].reduce((sum, r) => sum + r.regularWage, 0),
+              overtimeWage: records[i].reduce((sum, r) => sum + r.overtimeWage, 0),
+              totalWage: records[i].reduce((sum, r) => sum + r.totalWage, 0),
+              records: records[i],
+            }))
+            .filter((w) => w.totalWage > 0),
+        );
+      } finally {
+        setWageLoading(false);
+      }
+    };
     fetchWages();
   }, [wageYear, wageMonth, staffList]);
 
@@ -84,7 +83,7 @@ export default function WageTab({ staffList }: Props) {
       {wageLoading && <p className={styles.empty}>불러오는 중...</p>}
 
       {!wageLoading && wageData.length === 0 && (
-        <p className={styles.empty}>직원 정보가 없습니다.</p>
+        <p className={styles.empty}>이번 달 급여 내역이 없습니다.</p>
       )}
 
       {!wageLoading &&
