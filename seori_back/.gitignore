@@ -41,5 +41,4 @@ native/
 wrapper/
 
 ### Secrets ###
-application.yaml
 application.properties
