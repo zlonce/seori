@@ -17,3 +17,8 @@ jwt:
 
 front:
   url: http://localhost:5173
+
+app:
+  cookie:
+    secure: false
+    same-site: Lax
