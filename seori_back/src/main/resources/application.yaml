@@ -2,14 +2,12 @@ spring:
   application:
     name: seori_back
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE}
   jackson:
     serialization:
       write-dates-as-timestamps: false
 
   jpa:
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
