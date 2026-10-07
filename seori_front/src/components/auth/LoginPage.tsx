@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "./LoginPage.module.css";
 import LoginForm from "./LoginForm";
 import { useAuth } from "../../hooks/useAuth";
-import type { User } from "../../context/AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
-  const handleLoginSuccess = (_user: User) => {
+  const handleLoginSuccess = () => {
     navigate("/schedule");
   };
 

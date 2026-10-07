@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { closeVotingAPI, saveVotesAPI } from "../../api/schedule";
 import type { ScheduleWeek, ScheduleWeekDetail } from "../../api/schedule";
 import { DAY_KO } from "./scheduleUtils";
@@ -26,35 +26,34 @@ export default function VotingView({
   onUpdateWeekInfo,
   onError,
 }: Props) {
-  const [localVoteSet, setLocalVoteSet] = useState<Set<string>>(new Set());
-  const [voteDirty, setVoteDirty] = useState(false);
-
-  useEffect(() => {
-    setLocalVoteSet(
+  const serverVotes = useMemo(
+    () =>
       new Set(
         currentDetail.votes
           .filter((v) => v.userId === myId)
           .map((v) => v.availableDate),
       ),
-    );
-    setVoteDirty(false);
-  }, [currentDetail, myId]);
+    [currentDetail, myId],
+  );
+  // 사용자가 편집 중인 투표. null이면 편집하지 않은 상태(서버 값을 그대로 표시)
+  const [draft, setDraft] = useState<Set<string> | null>(null);
+  const localVoteSet = draft ?? serverVotes;
+  const voteDirty = draft !== null;
 
   const toggleMyVote = (date: string) => {
-    setLocalVoteSet((prev) => {
-      const next = new Set(prev);
+    setDraft((prev) => {
+      const next = new Set(prev ?? serverVotes);
       if (next.has(date)) next.delete(date);
       else next.add(date);
       return next;
     });
-    setVoteDirty(true);
   };
 
   const handleSaveVotes = async () => {
     try {
       await saveVotesAPI(currentDetail.id, Array.from(localVoteSet));
       await onRefreshDetail();
-      setVoteDirty(false);
+      setDraft(null);
     } catch {
       onError("투표 저장에 실패했습니다.");
     }
