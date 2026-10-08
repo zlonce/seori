@@ -399,6 +399,7 @@ export default function SchedulePage() {
 
       {!detailLoading && currentDetail?.status === "VOTING" && (
         <VotingView
+          key={currentDetail.id}
           currentDetail={currentDetail}
           businessDates={businessDates}
           myId={myId}

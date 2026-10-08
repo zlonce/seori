@@ -3,7 +3,7 @@ import styles from "./LoginForm.module.css";
 import { validateLoginForm } from "../../utils/validators";
 import { loginAPI } from "../../api/auth";
 import { useAuth } from "../../hooks/useAuth";
-import type { User } from "../../context/AuthContext";
+import type { User } from "../../context/authContextDef";
 
 interface LoginFormProps {
   onLoginSuccess?: (user: User) => void;

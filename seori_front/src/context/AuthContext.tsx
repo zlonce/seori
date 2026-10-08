@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useState,
-  useCallback,
-  useEffect,
-  type ReactNode,
-} from "react";
+import { useState, useCallback, useEffect, type ReactNode } from "react";
 
 import {
   getAccessToken,
@@ -14,23 +8,7 @@ import {
   isTokenValid,
 } from "../utils/tokenManager";
 import { refreshTokenAPI, logoutAPI } from "../api/auth";
-
-export type User = {
-  userId: string;
-  phone: string;
-  role: "ROLE_OWNER" | "ROLE_MANAGER" | "ROLE_STAFF";
-};
-
-type AuthContextType = {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (accessToken: string) => User | null;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
-};
-
-export const AuthContext = createContext<AuthContextType | null>(null);
+import { AuthContext, type AuthContextType, type User } from "./authContextDef";
 
 const buildUserFromToken = (token: string): User | null => {
   const decoded = decodeToken(token) as {

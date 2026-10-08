@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  back:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: seori
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    defaults:
+      run:
+        working-directory: seori_back
+    env:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      JWT_SECRET: Y2ktdGVzdC1zZWNyZXQtY2ktdGVzdC1zZWNyZXQtMTIzNA==
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: chmod +x gradlew && ./gradlew build --no-daemon
+
+  front:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: seori_front
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: seori_front/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
