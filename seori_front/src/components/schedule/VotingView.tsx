@@ -35,7 +35,7 @@ export default function VotingView({
       ),
     [currentDetail, myId],
   );
-  // 사용자가 편집 중인 투표. null이면 편집하지 않은 상태(서버 값을 그대로 표시)
+
   const [draft, setDraft] = useState<Set<string> | null>(null);
   const localVoteSet = draft ?? serverVotes;
   const voteDirty = draft !== null;
@@ -50,10 +50,11 @@ export default function VotingView({
   };
 
   const handleSaveVotes = async () => {
+    const saved = draft;
     try {
       await saveVotesAPI(currentDetail.id, Array.from(localVoteSet));
       await onRefreshDetail();
-      setDraft(null);
+      setDraft((cur) => (cur === saved ? null : cur));
     } catch {
       onError("투표 저장에 실패했습니다.");
     }
