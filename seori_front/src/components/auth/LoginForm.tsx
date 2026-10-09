@@ -6,6 +6,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { User } from "../../context/authContextDef";
 import logoUrl from "../../assets/seori_logo.png";
 
+
 interface LoginFormProps {
   onLoginSuccess?: (user: User) => void;
 }
