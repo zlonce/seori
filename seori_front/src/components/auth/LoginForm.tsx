@@ -4,6 +4,8 @@ import { validateLoginForm } from "../../utils/validators";
 import { loginAPI } from "../../api/auth";
 import { useAuth } from "../../hooks/useAuth";
 import type { User } from "../../context/authContextDef";
+import logoUrl from "../../assets/seori_logo.png";
+
 
 interface LoginFormProps {
   onLoginSuccess?: (user: User) => void;
@@ -67,7 +69,7 @@ const LoginForm = ({ onLoginSuccess }: LoginFormProps) => {
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.logoContainer}>
         <img
-          src="/src/assets/seori_logo.png"
+          src={logoUrl}
           alt="서리 로고"
           className={styles.logo}
         />
