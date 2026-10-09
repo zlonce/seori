@@ -1,0 +1,36 @@
+# 리뷰 언어 설정
+language: "ko-KR"
+
+reviews:
+  reviews:
+  # 리뷰 수준
+  profile: "assertive"
+
+  # 단순 코멘트만 남김 (merge 차단 안됨)
+  request_changes_workflow: false
+
+  # PR 전체 요약 생성
+  high_level_summary: true
+
+  # PR 승인/거절 상태 표시
+  review_status: true
+
+  # 상세 리뷰 펼침 여부
+  collapse_walkthrough: false
+
+  # 불필요한 기능 비활성화
+  poem: false
+
+  # 리뷰 대상 제외
+  path_filters:
+    - "!**/build/**"
+    - "!**/.gradle/**"
+    - "!**/generated/**"
+    - "!**/*.md"
+    - "!**/docs/**"
+    - "!**/.idea/**"
+    - "!**/*.iml"
+    - "!**/reports/**"
+
+chat:
+  auto_reply: true

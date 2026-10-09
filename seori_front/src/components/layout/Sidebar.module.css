@@ -1,0 +1,89 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: var(--z-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+}
+
+.overlayVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 220px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform var(--transition-base);
+  z-index: var(--z-sidebar);
+  display: flex;
+  flex-direction: column;
+  padding-top: 12px;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  color: var(--color-text-light);
+  align-self: flex-end;
+  border-radius: var(--radius-xs);
+}
+
+.closeBtn:hover {
+  color: var(--color-text-secondary);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: none;
+  border: none;
+  padding: 16px 24px;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text);
+  transition: background var(--transition-fast);
+}
+
+.navItem:hover {
+  background: var(--color-bg-subtle);
+}
+
+.passwordLink {
+  margin-top: auto;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  padding: 8px 20px 16px;
+  font-size: 12px;
+  color: var(--color-text-light);
+  cursor: pointer;
+}
+
+.passwordLink:hover {
+  color: var(--color-text-secondary);
+}
