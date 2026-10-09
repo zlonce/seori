@@ -1,6 +1,5 @@
 package com.example.seori_back.workShift.controller;
 
-import com.example.seori_back.workShift.dto.request.CreateWorkShiftRequestDto;
 import com.example.seori_back.workShift.dto.request.UpdateWorkShiftRequestDto;
 import com.example.seori_back.workShift.dto.response.WorkShiftResponseDto;
 import com.example.seori_back.workShift.service.WorkShiftService;
@@ -11,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,13 +40,6 @@ public class WorkShiftController {
             @RequestParam int year,
             @RequestParam int month) {
         return ResponseEntity.ok(workShiftService.getStaffShifts(staffId, year, month));
-    }
-
-    @PostMapping
-    public ResponseEntity<WorkShiftResponseDto> create(
-            @AuthenticationPrincipal String userId,
-            @RequestBody @Valid CreateWorkShiftRequestDto request) {
-        return ResponseEntity.ok(workShiftService.create(userId, request));
     }
 
     @PutMapping("/{id}")
