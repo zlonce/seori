@@ -51,7 +51,6 @@ export default function InventoryPage() {
     try {
       await deleteSectionAPI(sectionId);
       setSections((prev) => prev.filter((s) => s.id !== sectionId));
-      setPendingDelete(null);
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -148,7 +147,11 @@ export default function InventoryPage() {
 
       {pendingDelete !== null && (
         <ConfirmModal
-          onConfirm={() => pendingDelete()}
+          onConfirm={() => {
+            const run = pendingDelete;
+            setPendingDelete(null);
+            run();
+          }}
           onCancel={() => setPendingDelete(null)}
         />
       )}
