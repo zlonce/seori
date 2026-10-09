@@ -50,6 +50,13 @@ export const confirmScheduleAPI = (
 ) =>
   client.put<ScheduleWeek>(`/schedule/${weekId}/confirm`, { assignments }).then((r) => r.data);
 
+export const updateAssignmentsAPI = (
+  weekId: number,
+  add: { userId: string; workDate: string }[],
+  remove: { userId: string; workDate: string }[]
+) =>
+  client.patch<ScheduleWeek>(`/schedule/${weekId}/assignments`, { add, remove }).then((r) => r.data);
+
 export const getVotesAPI = (weekId: number) =>
   client.get<ScheduleVote[]>(`/schedule/${weekId}/votes`).then((r) => r.data);
 

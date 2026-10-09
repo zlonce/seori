@@ -5,10 +5,10 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.seori_back.user.dto.request.ChangePasswordRequestDto;
 import com.example.seori_back.user.dto.request.CreateUserRequestDto;
 import com.example.seori_back.user.dto.request.UpdateStaffRequestDto;
+import com.example.seori_back.user.dto.response.StaffResponseDto;
 import com.example.seori_back.user.dto.response.StaffSummaryResponseDto;
 import com.example.seori_back.user.service.UserService;
 
@@ -37,9 +38,15 @@ public class UserController {
 	}
 
 	@GetMapping("/staff")
-	@PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
-	public ResponseEntity<List<StaffSummaryResponseDto>> getStaffList() {
+	@PreAuthorize("hasRole('OWNER')")
+	public ResponseEntity<List<StaffResponseDto>> getStaffList() {
 		return ResponseEntity.ok(userService.getStaffList());
+	}
+
+	@GetMapping("/staff/summary")
+	@PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
+	public ResponseEntity<List<StaffSummaryResponseDto>> getStaffSummaries() {
+		return ResponseEntity.ok(userService.getStaffSummaries());
 	}
 
 	@PatchMapping("/{userId}/profile")
@@ -53,7 +60,7 @@ public class UserController {
 
 	@PatchMapping("/password")
 	public ResponseEntity<Void> changePassword(
-		@RequestAttribute String userId,
+		@AuthenticationPrincipal String userId,
 		@RequestBody @Valid ChangePasswordRequestDto request) {
 		userService.changePassword(userId, request);
 		return ResponseEntity.ok().build();

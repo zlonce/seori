@@ -2,21 +2,31 @@ import client from "./client";
 
 export type UserRole = "STAFF" | "MANAGER";
 
-export interface StaffSummary {
+export interface Staff {
   userId: string;
   name: string;
   phone: string;
   role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
-  weeklyWorkDays: number;
+  active: boolean;
 }
 
 export const getStaffListAPI = () =>
-  client.get<StaffSummary[]>("/users/staff").then((r) => r.data);
+  client.get<Staff[]>("/users/staff").then((r) => r.data);
 
-export const updateStaffProfileAPI = (userId: string, data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; weeklyWorkDays: number }) =>
-  client.patch(`/users/${userId}/profile`, data);
+export interface StaffSummary {
+  userId: string;
+  name: string;
+}
+
+export const getStaffSummariesAPI = () =>
+  client.get<StaffSummary[]>("/users/staff/summary").then((r) => r.data);
+
+export const updateStaffProfileAPI = (
+  userId: string,
+  data: { name: string; role: UserRole; hourlyWage: number; overtimeWage: number; active: boolean; password?: string },
+) => client.patch(`/users/${userId}/profile`, data);
 
 export const createUserAPI = (data: {
   phone: string;
@@ -24,5 +34,5 @@ export const createUserAPI = (data: {
   role: UserRole;
   hourlyWage: number;
   overtimeWage: number;
-  weeklyWorkDays: number;
+  password: string;
 }) => client.post("/users", data);

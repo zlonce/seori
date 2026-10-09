@@ -1,9 +1,9 @@
 package com.example.seori_back.schedule.dto.response;
 
-import com.example.seori_back.schedule.domain.entity.ScheduleAssignment;
 import com.example.seori_back.schedule.domain.entity.ScheduleVote;
 import com.example.seori_back.schedule.domain.entity.ScheduleWeek;
 import com.example.seori_back.schedule.domain.entity.WeekStatusEnum;
+import com.example.seori_back.workShift.domain.entity.WorkShift;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ public record ScheduleWeekDetailResponseDto(
     public static ScheduleWeekDetailResponseDto from(
             ScheduleWeek week,
             List<ScheduleVote> votes,
-            List<ScheduleAssignment> assignments
+            List<WorkShift> assignments
     ) {
         return new ScheduleWeekDetailResponseDto(
                 week.getId(),

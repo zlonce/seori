@@ -9,6 +9,7 @@ import com.example.seori_back.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,12 @@ public class AuthController {
 
     private final UserService userService;
 
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.same-site:Lax}")
+    private String cookieSameSite;
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(
             @RequestBody @Valid LoginRequestDto request,
@@ -37,8 +44,8 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
                 .httpOnly(true)
-                .secure(false) // 운영 환경에서는 true (HTTPS)
-                .sameSite("Lax")
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
                 .path("/api/auth")
                 .maxAge(Duration.ofDays(7))
                 .build();
@@ -63,8 +70,8 @@ public class AuthController {
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         ResponseCookie clearCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(false)
-                .sameSite("Lax")
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
                 .path("/api/auth")
                 .maxAge(Duration.ofSeconds(0))
                 .build();

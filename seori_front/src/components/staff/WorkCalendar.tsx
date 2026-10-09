@@ -1,6 +1,5 @@
 import { useState } from "react";
-import type { WorkRecordResponse } from "../../api/workRecord";
-import { deleteWorkRecordAPI } from "../../api/workRecord";
+import type { WorkShiftResponse } from "../../api/workShift";
 
 import WorkRecordModal from "./WorkRecordModal";
 import styles from "./WorkCalendar.module.css";
@@ -8,14 +7,16 @@ import styles from "./WorkCalendar.module.css";
 interface Props {
   year: number;
   month: number;
-  records: WorkRecordResponse[];
+  records: WorkShiftResponse[];
   specialDates: Set<string>;
   onRefresh: () => void;
+  restrictToScheduled?: boolean;
 }
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-const RECORD_COLOR = "#2196F3";
+const COMPLETED_COLOR = "#d65c5c";
+const SCHEDULED_COLOR = "#a7d65c";
 
 export default function WorkCalendar({
   year,
@@ -23,14 +24,15 @@ export default function WorkCalendar({
   records,
   specialDates,
   onRefresh,
+  restrictToScheduled = false,
 }: Props) {
   const [modalDate, setModalDate] = useState<string | null>(null);
-  const [editRecord, setEditRecord] = useState<WorkRecordResponse | undefined>(
+  const [editRecord, setEditRecord] = useState<WorkShiftResponse | undefined>(
     undefined,
   );
   const [toast, setToast] = useState("");
 
-  const recordMap = new Map<string, WorkRecordResponse>();
+  const recordMap = new Map<string, WorkShiftResponse>();
   records.forEach((r) => recordMap.set(r.workDate, r));
 
   const firstDay = new Date(year, month - 1, 1).getDay();
@@ -51,35 +53,24 @@ export default function WorkCalendar({
     const dateStr = toDateStr(day);
     const record = recordMap.get(dateStr);
 
-    if (record) {
-      setEditRecord(record);
-      setModalDate(dateStr);
-      return;
-    }
-
     if (dateStr > todayStr) {
-      setToast("미래 날짜에는 근무 기록을 추가할 수 없습니다.");
+      setToast(
+        record
+          ? "예정된 근무일입니다. 근무 후 실제 시간을 입력해주세요."
+          : "미래 날짜에는 근무 기록을 추가할 수 없습니다.",
+      );
       setTimeout(() => setToast(""), 2500);
       return;
     }
 
-    setEditRecord(undefined);
-    setModalDate(dateStr);
-  };
-
-  const handleDelete = async (
-    e: React.MouseEvent,
-    record: WorkRecordResponse,
-  ) => {
-    e.stopPropagation();
-    if (!confirm("삭제하시겠습니까?")) return;
-    try {
-      await deleteWorkRecordAPI(record.id);
-      onRefresh();
-    } catch {
-      setToast("삭제에 실패했습니다.");
+    if (!record && restrictToScheduled) {
+      setToast("예정된 근무일에만 시간을 입력할 수 있습니다.");
       setTimeout(() => setToast(""), 2500);
+      return;
     }
+
+    setEditRecord(record ?? undefined);
+    setModalDate(dateStr);
   };
 
   return (
@@ -89,14 +80,8 @@ export default function WorkCalendar({
       )}
 
       <div className={styles.dayHeader}>
-        {DAY_LABELS.map((d, i) => (
-          <div
-            key={d}
-            className={styles.dayLabel}
-            style={{
-              color: i === 0 ? "#e53935" : i === 6 ? "#1976D2" : "#666",
-            }}
-          >
+        {DAY_LABELS.map((d) => (
+          <div key={d} className={styles.dayLabel}>
             {d}
           </div>
         ))}
@@ -109,10 +94,7 @@ export default function WorkCalendar({
           const record = recordMap.get(dateStr);
           const isSpecial = specialDates.has(dateStr);
           const isToday = todayStr === dateStr;
-          const isPast = dateStr < todayStr;
           const isFuture = dateStr > todayStr;
-          const isSun = idx % 7 === 0;
-          const isSat = idx % 7 === 6;
 
           return (
             <button
@@ -123,14 +105,6 @@ export default function WorkCalendar({
                 opacity: isFuture ? 0.5 : 1,
               }}
               onClick={() => handleCellClick(day)}
-              onContextMenu={
-                record
-                  ? (e) => {
-                      e.preventDefault();
-                      handleDelete(e, record);
-                    }
-                  : undefined
-              }
             >
               <span
                 className={styles.dayNum}
@@ -139,13 +113,11 @@ export default function WorkCalendar({
                     ? "#e53935"
                     : record
                       ? "#fff"
-                      : isSun
-                        ? "#e53935"
-                        : isSat
-                          ? "#1976D2"
-                          : "#1a1a1a",
+                      : "#1a1a1a",
                   fontWeight: isSpecial || record ? 700 : 400,
-                  background: record ? RECORD_COLOR + "CC" : "transparent",
+                  background: record
+                    ? (record.startTime ? COMPLETED_COLOR : SCHEDULED_COLOR) + "CC"
+                    : "transparent",
                 }}
               >
                 {day}
@@ -157,8 +129,12 @@ export default function WorkCalendar({
 
       <div className={styles.legend}>
         <div className={styles.legendItem}>
-          <div className={styles.legendDot} style={{ background: RECORD_COLOR }} />
+          <div className={styles.legendDot} style={{ background: COMPLETED_COLOR }} />
           <span>근무완료</span>
+        </div>
+        <div className={styles.legendItem}>
+          <div className={styles.legendDot} style={{ background: SCHEDULED_COLOR }} />
+          <span>근무예정</span>
         </div>
         <div className={styles.legendItem}>
           <span className={styles.legendSpecial}>날짜</span>
@@ -172,7 +148,6 @@ export default function WorkCalendar({
           record={editRecord}
           onClose={() => setModalDate(null)}
           onSaved={onRefresh}
-          onDelete={editRecord ? async () => { await deleteWorkRecordAPI(editRecord.id); onRefresh(); } : undefined}
         />
       )}
     </div>

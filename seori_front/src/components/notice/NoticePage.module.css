@@ -17,17 +17,17 @@
 }
 
 .writeBtn {
-  background: #4a90e2;
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 6px 14px;
   font-size: 13px;
   cursor: pointer;
 }
 
 .writeBtn:hover {
-  background: #3a7bd5;
+  background: var(--color-primary-hover);
 }
 
 .backBtn {
@@ -49,36 +49,36 @@
 
 .editBtn {
   background: none;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
   padding: 5px 14px;
   font-size: 13px;
   cursor: pointer;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .deleteBtn {
   background: none;
   border: 1px solid #fca5a5;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 5px 14px;
   font-size: 13px;
   cursor: pointer;
-  color: #e74c3c;
+  color: var(--color-error);
 }
 
 .saveBtn {
-  background: #4a90e2;
+  background: var(--color-primary);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   padding: 6px 16px;
   font-size: 13px;
   cursor: pointer;
 }
 
 .saveBtn:hover {
-  background: #3a7bd5;
+  background: var(--color-primary-hover);
 }
 
 /* 목록 */
@@ -93,11 +93,11 @@
 
 .card {
   background: #fff;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: box-shadow 0.15s;
+  transition: box-shadow var(--transition-fast);
 }
 
 .card:hover {
@@ -116,22 +116,22 @@
   display: flex;
   gap: 10px;
   font-size: 12px;
-  color: #aaa;
+  color: var(--color-text-light);
 }
 
 .errorMsg {
-  color: #e74c3c;
+  color: var(--color-error);
   font-size: 13px;
   text-align: center;
   padding: 8px 12px;
   background: #fff0f0;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   margin-bottom: 12px;
 }
 
 .empty {
   text-align: center;
-  color: #bbb;
+  color: var(--color-text-faint);
   font-size: 14px;
   margin-top: 40px;
 }
@@ -148,24 +148,24 @@
   display: flex;
   gap: 10px;
   font-size: 12px;
-  color: #aaa;
+  color: var(--color-text-light);
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-bg-subtle);
 }
 
 .viewerWrap {
   background: #fff;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 16px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 /* 에디터 */
 .titleInput {
   width: 100%;
   border: none;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
   padding: 10px 0;
   font-size: 18px;
   font-weight: 600;
@@ -176,12 +176,12 @@
 }
 
 .titleInput::placeholder {
-  color: #ccc;
+  color: var(--color-text-faint);
 }
 
 .editorWrap {
   background: #fff;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
 }

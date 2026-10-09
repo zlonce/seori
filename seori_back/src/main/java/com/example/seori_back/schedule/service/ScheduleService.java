@@ -2,29 +2,36 @@ package com.example.seori_back.schedule.service;
 
 import com.example.seori_back.global.exception.CustomException;
 import com.example.seori_back.global.exception.ErrorCode;
-import com.example.seori_back.schedule.domain.entity.ScheduleAssignment;
 import com.example.seori_back.schedule.domain.entity.ScheduleVote;
 import com.example.seori_back.schedule.domain.entity.ScheduleWeek;
 import com.example.seori_back.schedule.domain.entity.WeekStatusEnum;
-import com.example.seori_back.schedule.dto.request.ConfirmScheduleRequestDto;
+import com.example.seori_back.schedule.dto.request.AssignmentItem;
+import com.example.seori_back.schedule.dto.request.AssignmentsRequestDto;
 import com.example.seori_back.schedule.dto.request.CreateScheduleWeekRequestDto;
 import com.example.seori_back.schedule.dto.request.SaveVotesRequestDto;
+import com.example.seori_back.schedule.dto.request.UpdateAssignmentsRequestDto;
 import com.example.seori_back.schedule.dto.request.UpdateBusinessDaysRequestDto;
 import com.example.seori_back.schedule.dto.response.ScheduleAssignmentResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleVoteResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleWeekDetailResponseDto;
 import com.example.seori_back.schedule.dto.response.ScheduleWeekResponseDto;
-import com.example.seori_back.schedule.repository.ScheduleAssignmentRepository;
 import com.example.seori_back.schedule.repository.ScheduleVoteRepository;
 import com.example.seori_back.schedule.repository.ScheduleWeekRepository;
 import com.example.seori_back.user.domain.entity.User;
 import com.example.seori_back.user.repository.UserRepository;
+import com.example.seori_back.workShift.domain.entity.WorkShift;
+import com.example.seori_back.workShift.repository.WorkShiftRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +39,7 @@ public class ScheduleService {
 
     private final ScheduleWeekRepository scheduleWeekRepository;
     private final ScheduleVoteRepository scheduleVoteRepository;
-    private final ScheduleAssignmentRepository scheduleAssignmentRepository;
+    private final WorkShiftRepository workShiftRepository;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -46,7 +53,7 @@ public class ScheduleService {
     public ScheduleWeekDetailResponseDto getWeekDetail(Long weekId) {
         ScheduleWeek week = findWeek(weekId);
         List<ScheduleVote> votes = scheduleVoteRepository.findByWeekId(weekId);
-        List<ScheduleAssignment> assignments = scheduleAssignmentRepository.findByWeekId(weekId);
+        List<WorkShift> assignments = workShiftRepository.findByWeekId(weekId);
         return ScheduleWeekDetailResponseDto.from(week, votes, assignments);
     }
 
@@ -78,25 +85,71 @@ public class ScheduleService {
     }
 
     @Transactional
-    public ScheduleWeekResponseDto confirm(Long weekId, ConfirmScheduleRequestDto request) {
+    public ScheduleWeekResponseDto confirm(Long weekId, AssignmentsRequestDto request) {
         ScheduleWeek week = findWeek(weekId);
-        if (week.getStatus() == WeekStatusEnum.VOTING) {
+        if (week.getStatus() != WeekStatusEnum.CLOSED) {
             throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
         }
 
-        scheduleAssignmentRepository.deleteByWeekId(weekId);
-
-        List<ScheduleAssignment> assignments = request.assignments().stream()
-                .map(item -> {
-                    User user = userRepository.findById(item.userId())
-                            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-                    return ScheduleAssignment.create(week, user, item.workDate());
-                })
-                .toList();
-        scheduleAssignmentRepository.saveAll(assignments);
+        createMissingShifts(week, request.assignments());
 
         week.confirm();
         return ScheduleWeekResponseDto.from(week);
+    }
+
+    @Transactional
+    public ScheduleWeekResponseDto updateAssignments(Long weekId, UpdateAssignmentsRequestDto request) {
+        ScheduleWeek week = findWeek(weekId);
+        if (week.getStatus() != WeekStatusEnum.CONFIRMED) {
+            throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
+        }
+
+        request.remove().forEach(item ->
+                workShiftRepository.findByUserIdAndWorkDate(item.userId(), item.workDate())
+                        .filter(w -> w.getStartTime() == null)
+                        .ifPresent(workShiftRepository::delete));
+
+        createMissingShifts(week, request.add());
+
+        return ScheduleWeekResponseDto.from(week);
+    }
+
+    private void createMissingShifts(ScheduleWeek week, List<AssignmentItem> items) {
+        List<AssignmentItem> distinctItems = items.stream().distinct().toList();
+        if (distinctItems.isEmpty()) {
+            return;
+        }
+        distinctItems.forEach(item -> validateBusinessDate(week, item.workDate()));
+
+        List<String> userIds = distinctItems.stream().map(AssignmentItem::userId).distinct().toList();
+        List<LocalDate> workDates = distinctItems.stream().map(AssignmentItem::workDate).distinct().toList();
+
+        Set<AssignmentItem> existing = workShiftRepository.findByUserIdInAndWorkDateIn(userIds, workDates).stream()
+                .map(w -> new AssignmentItem(w.getUser().getUserId(), w.getWorkDate()))
+                .collect(Collectors.toSet());
+
+        Map<String, User> userById = userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getUserId, user -> user));
+
+        List<WorkShift> toCreate = distinctItems.stream()
+                .filter(item -> !existing.contains(item))
+                .map(item -> {
+                    User user = userById.get(item.userId());
+                    if (user == null) {
+                        throw new CustomException(ErrorCode.USER_NOT_FOUND);
+                    }
+                    return WorkShift.createScheduled(user, week, item.workDate());
+                })
+                .toList();
+        workShiftRepository.saveAll(toCreate);
+    }
+
+    private void validateBusinessDate(ScheduleWeek week, LocalDate date) {
+        long offset = ChronoUnit.DAYS.between(week.getWeekStartDate(), date);
+        boolean[] businessDays = week.getBusinessDaysAsArray();
+        if (offset < 0 || offset > 6 || !businessDays[(int) offset]) {
+            throw new CustomException(ErrorCode.INVALID_ASSIGNMENT_DATE);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -128,7 +181,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public List<ScheduleAssignmentResponseDto> getAssignments(Long weekId) {
         findWeek(weekId);
-        return scheduleAssignmentRepository.findByWeekId(weekId).stream()
+        return workShiftRepository.findByWeekId(weekId).stream()
                 .map(ScheduleAssignmentResponseDto::from)
                 .toList();
     }

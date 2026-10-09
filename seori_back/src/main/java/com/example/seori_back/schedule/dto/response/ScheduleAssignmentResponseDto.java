@@ -1,6 +1,6 @@
 package com.example.seori_back.schedule.dto.response;
 
-import com.example.seori_back.schedule.domain.entity.ScheduleAssignment;
+import com.example.seori_back.workShift.domain.entity.WorkShift;
 
 import java.time.LocalDate;
 
@@ -9,11 +9,11 @@ public record ScheduleAssignmentResponseDto(
         String userName,
         LocalDate workDate
 ) {
-    public static ScheduleAssignmentResponseDto from(ScheduleAssignment assignment) {
+    public static ScheduleAssignmentResponseDto from(WorkShift shift) {
         return new ScheduleAssignmentResponseDto(
-                assignment.getUser().getUserId(),
-                assignment.getUser().getName(),
-                assignment.getWorkDate()
+                shift.getUser().getUserId(),
+                shift.getUser().getName(),
+                shift.getWorkDate()
         );
     }
 }
