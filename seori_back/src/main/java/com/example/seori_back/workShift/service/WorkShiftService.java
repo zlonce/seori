@@ -7,7 +7,6 @@ import com.example.seori_back.specialday.service.SpecialDayService;
 import com.example.seori_back.user.domain.entity.User;
 import com.example.seori_back.user.repository.UserRepository;
 import com.example.seori_back.workShift.domain.entity.WorkShift;
-import com.example.seori_back.workShift.dto.request.CreateWorkShiftRequestDto;
 import com.example.seori_back.workShift.dto.request.UpdateWorkShiftRequestDto;
 import com.example.seori_back.workShift.dto.response.WorkShiftResponseDto;
 import com.example.seori_back.workShift.repository.WorkShiftRepository;
@@ -43,19 +42,6 @@ public class WorkShiftService {
         return workShiftRepository.findByUserIdAndYearMonth(staffId, year, month).stream()
                 .map(WorkShiftResponseDto::from)
                 .toList();
-    }
-
-    @Transactional
-    public WorkShiftResponseDto create(String userId, CreateWorkShiftRequestDto request) {
-        validateNotFutureDate(request.workDate());
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        boolean isSpecial = specialDayService.isSpecialDate(request.workDate());
-        WageCalculator.WageResult wage = wageCalculator.calculate(request.startTime(), request.endTime(), user.getHourlyWage(), user.getOvertimeWage(), isSpecial);
-        WorkShift shift = WorkShift.create(user, request.workDate(), request.startTime(), request.endTime(),
-                isSpecial, wage.regularMinutes(), wage.overtimeMinutes(), wage.regularWage(), wage.overtimeWage());
-        workShiftRepository.save(shift);
-        return WorkShiftResponseDto.from(shift);
     }
 
     @Transactional

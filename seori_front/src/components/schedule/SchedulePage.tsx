@@ -260,7 +260,6 @@ export default function SchedulePage() {
               records={calRecords}
               specialDates={calSpecialDates}
               onRefresh={fetchCalendarData}
-              restrictToScheduled={user?.role === "ROLE_STAFF"}
             />
             <WorkTimeList records={calRecords} onRefresh={fetchCalendarData} />
           </>

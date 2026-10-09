@@ -57,22 +57,6 @@ public class WorkShift {
 
     private int overtimeWage;
 
-    public static WorkShift create(User user, LocalDate workDate, LocalTime startTime, LocalTime endTime,
-                                    boolean specialDay, int regularMinutes, int overtimeMinutes,
-                                    int regularWage, int overtimeWage) {
-        WorkShift shift = new WorkShift();
-        shift.user = user;
-        shift.workDate = workDate;
-        shift.startTime = startTime;
-        shift.endTime = endTime;
-        shift.specialDay = specialDay;
-        shift.regularMinutes = regularMinutes;
-        shift.overtimeMinutes = overtimeMinutes;
-        shift.regularWage = regularWage;
-        shift.overtimeWage = overtimeWage;
-        return shift;
-    }
-
     public static WorkShift createScheduled(User user, ScheduleWeek week, LocalDate workDate) {
         WorkShift shift = new WorkShift();
         shift.user = user;
