@@ -10,7 +10,6 @@ interface Props {
   records: WorkShiftResponse[];
   specialDates: Set<string>;
   onRefresh: () => void;
-  restrictToScheduled?: boolean;
 }
 
 const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
@@ -24,12 +23,8 @@ export default function WorkCalendar({
   records,
   specialDates,
   onRefresh,
-  restrictToScheduled = false,
 }: Props) {
-  const [modalDate, setModalDate] = useState<string | null>(null);
-  const [editRecord, setEditRecord] = useState<WorkShiftResponse | undefined>(
-    undefined,
-  );
+  const [editRecord, setEditRecord] = useState<WorkShiftResponse | null>(null);
   const [toast, setToast] = useState("");
 
   const recordMap = new Map<string, WorkShiftResponse>();
@@ -53,24 +48,19 @@ export default function WorkCalendar({
     const dateStr = toDateStr(day);
     const record = recordMap.get(dateStr);
 
-    if (dateStr > todayStr) {
-      setToast(
-        record
-          ? "예정된 근무일입니다. 근무 후 실제 시간을 입력해주세요."
-          : "미래 날짜에는 근무 기록을 추가할 수 없습니다.",
-      );
-      setTimeout(() => setToast(""), 2500);
-      return;
-    }
-
-    if (!record && restrictToScheduled) {
+    if (!record) {
       setToast("예정된 근무일에만 시간을 입력할 수 있습니다.");
       setTimeout(() => setToast(""), 2500);
       return;
     }
 
-    setEditRecord(record ?? undefined);
-    setModalDate(dateStr);
+    if (dateStr > todayStr) {
+      setToast("예정된 근무일입니다. 근무 후 실제 시간을 입력해주세요.");
+      setTimeout(() => setToast(""), 2500);
+      return;
+    }
+
+    setEditRecord(record);
   };
 
   return (
@@ -142,11 +132,11 @@ export default function WorkCalendar({
         </div>
       </div>
 
-      {modalDate && (
+      {editRecord && (
         <WorkRecordModal
-          date={modalDate}
+          date={editRecord.workDate}
           record={editRecord}
-          onClose={() => setModalDate(null)}
+          onClose={() => setEditRecord(null)}
           onSaved={onRefresh}
         />
       )}

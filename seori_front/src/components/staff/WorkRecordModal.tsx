@@ -1,11 +1,11 @@
 import { useState } from "react";
 import type { WorkShiftResponse } from "../../api/workShift";
-import { createWorkShiftAPI, updateWorkShiftAPI } from "../../api/workShift";
+import { updateWorkShiftAPI } from "../../api/workShift";
 import styles from "./WorkRecordModal.module.css";
 
 interface Props {
   date: string;
-  record?: WorkShiftResponse;
+  record: WorkShiftResponse;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -20,9 +20,9 @@ export default function WorkRecordModal({
   onSaved,
 }: Props) {
   const [startTime, setStartTime] = useState(
-    record?.startTime ?? DEFAULT_START,
+    record.startTime ?? DEFAULT_START,
   );
-  const [endTime, setEndTime] = useState(record?.endTime ?? DEFAULT_END);
+  const [endTime, setEndTime] = useState(record.endTime ?? DEFAULT_END);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -34,11 +34,7 @@ export default function WorkRecordModal({
     setLoading(true);
     setError("");
     try {
-      if (record) {
-        await updateWorkShiftAPI(record.id, { startTime, endTime });
-      } else {
-        await createWorkShiftAPI({ workDate: date, startTime, endTime });
-      }
+      await updateWorkShiftAPI(record.id, { startTime, endTime });
       onSaved();
       onClose();
     } catch {
@@ -54,7 +50,7 @@ export default function WorkRecordModal({
         <div className={styles.titleRow}>
           <h3 className={styles.title}>
             {date} 근무 기록
-            {record && record.startTime === null && (
+            {record.startTime === null && (
               <span className={styles.scheduledBadge}> (예정)</span>
             )}
           </h3>
