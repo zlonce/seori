@@ -222,8 +222,9 @@ export default function SchedulePage() {
     }
   };
 
-  const votingWeekIdx = isOwner ? -1 : weeks.map((w) => w.status).lastIndexOf("VOTING");
+  const votingWeekIdx = weeks.map((w) => w.status).lastIndexOf("VOTING");
   const hasVoted =
+    !isOwner &&
     votingWeekIdx !== -1 &&
     (cacheRef.current.get(weeks[votingWeekIdx].id)?.votes.some((v) => v.userId === myId) ?? false);
 
@@ -249,7 +250,7 @@ export default function SchedulePage() {
       className={`${styles.voteNavBtn} ${hasVoted ? styles.voteNavBtnDone : ""}`}
       onClick={goToVoting}
     >
-      {hasVoted ? "투표 확인" : "투표하기"}
+      {isOwner ? "투표 확인" : hasVoted ? "투표 확인" : "투표하기"}
     </button>
   );
 
