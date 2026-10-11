@@ -163,6 +163,8 @@ export default function SchedulePage() {
         if (fetchedWeeks.length === 0) return;
 
         const recentWeeks = fetchedWeeks.slice(-PREFETCH_COUNT);
+        const latestVoting = [...fetchedWeeks].reverse().find((w) => w.status === "VOTING");
+        if (latestVoting && !recentWeeks.some((w) => w.id === latestVoting.id)) recentWeeks.push(latestVoting);
         const details = await Promise.all(recentWeeks.map((w) => getWeekDetailAPI(w.id)));
         details.forEach((d) => cacheRef.current.set(d.id, d));
 
@@ -216,6 +218,25 @@ export default function SchedulePage() {
     }
   };
 
+  const votingWeekIdx = isOwner ? -1 : weeks.map((w) => w.status).lastIndexOf("VOTING");
+  const hasVoted =
+    votingWeekIdx !== -1 &&
+    (cacheRef.current.get(weeks[votingWeekIdx].id)?.votes.some((v) => v.userId === myId) ?? false);
+
+  const goToVoting = () => {
+    setTab("weekly");
+    setWeekIdx(votingWeekIdx);
+  };
+
+  const voteBtn = votingWeekIdx !== -1 && (
+    <button
+      className={`${styles.voteNavBtn} ${hasVoted ? styles.voteNavBtnDone : ""}`}
+      onClick={goToVoting}
+    >
+      {hasVoted ? "투표 확인" : "투표하기"}
+    </button>
+  );
+
   const tabBar = showCalendarTab && (
     <div className={styles.tabs}>
       <button
@@ -238,6 +259,7 @@ export default function SchedulePage() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h2 className={styles.title}>일정</h2>
+          {voteBtn}
         </div>
         {tabBar}
         {errorMsg && <p className={styles.waitMsg}>{errorMsg}</p>}
@@ -314,14 +336,17 @@ export default function SchedulePage() {
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>일정</h2>
-        {isManagerOrAbove && !showCreateForm && (
-          <button
-            className={styles.createBtn}
-            onClick={() => { setShowCreateForm(true); setNewWeekDeadline(defaultDeadlineStr(nextWeekStart)); }}
-          >
-            + 주 생성
-          </button>
-        )}
+        <div className={styles.headerActions}>
+          {voteBtn}
+          {isManagerOrAbove && !showCreateForm && (
+            <button
+              className={styles.createBtn}
+              onClick={() => { setShowCreateForm(true); setNewWeekDeadline(defaultDeadlineStr(nextWeekStart)); }}
+            >
+              + 주 생성
+            </button>
+          )}
+        </div>
       </div>
 
       {tabBar}
