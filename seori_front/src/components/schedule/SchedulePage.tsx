@@ -33,6 +33,15 @@ import styles from "./SchedulePage.module.css";
 
 type Tab = "weekly" | "calendar";
 
+function findCurrentWeekIdx(weeks: ScheduleWeek[]) {
+  const today = toLocalStr(new Date());
+  return weeks.findIndex((w) => {
+    const end = new Date(w.weekStartDate + "T00:00:00");
+    end.setDate(end.getDate() + 6);
+    return w.weekStartDate <= today && today <= toLocalStr(end);
+  });
+}
+
 export default function SchedulePage() {
   const { user } = useAuth();
   const isManagerOrAbove = user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
@@ -168,12 +177,7 @@ export default function SchedulePage() {
         const details = await Promise.all(recentWeeks.map((w) => getWeekDetailAPI(w.id)));
         details.forEach((d) => cacheRef.current.set(d.id, d));
 
-        const today = toLocalStr(new Date());
-        const currentWeekIdx = fetchedWeeks.findIndex((w) => {
-          const end = new Date(w.weekStartDate + "T00:00:00");
-          end.setDate(end.getDate() + 6);
-          return w.weekStartDate <= today && today <= toLocalStr(end);
-        });
+        const currentWeekIdx = findCurrentWeekIdx(fetchedWeeks);
         setWeekIdx(currentWeekIdx !== -1 ? currentWeekIdx : fetchedWeeks.length - 1);
       } catch {
         showError("데이터를 불러오지 못했습니다.");
@@ -228,6 +232,18 @@ export default function SchedulePage() {
     setWeekIdx(votingWeekIdx);
   };
 
+  const goToThisWeek = () => {
+    const idx = findCurrentWeekIdx(weeks);
+    setTab("weekly");
+    setWeekIdx(idx !== -1 ? idx : weeks.length - 1);
+  };
+
+  const titleBtn = (
+    <h2 className={styles.title}>
+      <button className={styles.titleBtn} onClick={goToThisWeek}>일정</button>
+    </h2>
+  );
+
   const voteBtn = votingWeekIdx !== -1 && (
     <button
       className={`${styles.voteNavBtn} ${hasVoted ? styles.voteNavBtnDone : ""}`}
@@ -258,7 +274,7 @@ export default function SchedulePage() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>일정</h2>
+          {titleBtn}
           {voteBtn}
         </div>
         {tabBar}
@@ -335,7 +351,7 @@ export default function SchedulePage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>일정</h2>
+        {titleBtn}
         <div className={styles.headerActions}>
           {voteBtn}
           {isManagerOrAbove && !showCreateForm && (
