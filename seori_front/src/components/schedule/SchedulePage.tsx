@@ -137,6 +137,7 @@ export default function SchedulePage() {
       cacheRef.current.set(weekId, detail);
       if (activeWeekIdRef.current === weekId) setCurrentDetail(detail);
     } catch {
+      if (activeWeekIdRef.current === weekId) setCurrentDetail(null);
       showError("주차 정보를 불러오지 못했습니다.");
     } finally {
       setDetailLoading(false);
