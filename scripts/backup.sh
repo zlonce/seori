@@ -13,8 +13,11 @@ cd "$APP_DIR"
 
 FILE="$BACKUP_DIR/seori_$(date +%Y%m%d_%H%M%S).sql.gz"
 
+trap 'rm -f "$FILE.tmp"' EXIT
+
+# 비밀번호를 명령줄 인자로 넘기지 않도록 컨테이너 안에서 임시 옵션 파일(0600)을 만들어 전달
 docker compose exec -T mysql sh -c \
-  'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction --routines --triggers --no-tablespaces seori' \
+  'umask 077; cnf=$(mktemp); trap "rm -f $cnf" EXIT; printf "[client]\nuser=root\npassword=\"%s\"\n" "$MYSQL_ROOT_PASSWORD" > "$cnf"; mysqldump --defaults-extra-file="$cnf" --single-transaction --routines --triggers --no-tablespaces seori' \
   | gzip > "$FILE.tmp"
 
 mv "$FILE.tmp" "$FILE"
