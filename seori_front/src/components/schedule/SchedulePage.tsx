@@ -33,6 +33,15 @@ import styles from "./SchedulePage.module.css";
 
 type Tab = "weekly" | "calendar";
 
+function findCurrentWeekIdx(weeks: ScheduleWeek[]) {
+  const today = toLocalStr(new Date());
+  return weeks.findIndex((w) => {
+    const end = new Date(w.weekStartDate + "T00:00:00");
+    end.setDate(end.getDate() + 6);
+    return w.weekStartDate <= today && today <= toLocalStr(end);
+  });
+}
+
 export default function SchedulePage() {
   const { user } = useAuth();
   const isManagerOrAbove = user?.role === "ROLE_OWNER" || user?.role === "ROLE_MANAGER";
@@ -128,6 +137,7 @@ export default function SchedulePage() {
       cacheRef.current.set(weekId, detail);
       if (activeWeekIdRef.current === weekId) setCurrentDetail(detail);
     } catch {
+      if (activeWeekIdRef.current === weekId) setCurrentDetail(null);
       showError("주차 정보를 불러오지 못했습니다.");
     } finally {
       setDetailLoading(false);
@@ -163,15 +173,12 @@ export default function SchedulePage() {
         if (fetchedWeeks.length === 0) return;
 
         const recentWeeks = fetchedWeeks.slice(-PREFETCH_COUNT);
+        const latestVoting = [...fetchedWeeks].reverse().find((w) => w.status === "VOTING");
+        if (latestVoting && !recentWeeks.some((w) => w.id === latestVoting.id)) recentWeeks.push(latestVoting);
         const details = await Promise.all(recentWeeks.map((w) => getWeekDetailAPI(w.id)));
         details.forEach((d) => cacheRef.current.set(d.id, d));
 
-        const today = toLocalStr(new Date());
-        const currentWeekIdx = fetchedWeeks.findIndex((w) => {
-          const end = new Date(w.weekStartDate + "T00:00:00");
-          end.setDate(end.getDate() + 6);
-          return w.weekStartDate <= today && today <= toLocalStr(end);
-        });
+        const currentWeekIdx = findCurrentWeekIdx(fetchedWeeks);
         setWeekIdx(currentWeekIdx !== -1 ? currentWeekIdx : fetchedWeeks.length - 1);
       } catch {
         showError("데이터를 불러오지 못했습니다.");
@@ -216,6 +223,38 @@ export default function SchedulePage() {
     }
   };
 
+  const votingWeekIdx = weeks.map((w) => w.status).lastIndexOf("VOTING");
+  const hasVoted =
+    !isOwner &&
+    votingWeekIdx !== -1 &&
+    (cacheRef.current.get(weeks[votingWeekIdx].id)?.votes.some((v) => v.userId === myId) ?? false);
+
+  const goToVoting = () => {
+    setTab("weekly");
+    setWeekIdx(votingWeekIdx);
+  };
+
+  const goToThisWeek = () => {
+    const idx = findCurrentWeekIdx(weeks);
+    setTab("weekly");
+    setWeekIdx(idx !== -1 ? idx : weeks.length - 1);
+  };
+
+  const titleBtn = (
+    <h2 className={styles.title}>
+      <button className={styles.titleBtn} onClick={goToThisWeek}>일정</button>
+    </h2>
+  );
+
+  const voteBtn = votingWeekIdx !== -1 && (
+    <button
+      className={`${styles.voteNavBtn} ${hasVoted ? styles.voteNavBtnDone : ""}`}
+      onClick={goToVoting}
+    >
+      {isOwner ? "투표 확인" : hasVoted ? "투표 확인" : "투표하기"}
+    </button>
+  );
+
   const tabBar = showCalendarTab && (
     <div className={styles.tabs}>
       <button
@@ -237,7 +276,8 @@ export default function SchedulePage() {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h2 className={styles.title}>일정</h2>
+          {titleBtn}
+          {voteBtn}
         </div>
         {tabBar}
         {errorMsg && <p className={styles.waitMsg}>{errorMsg}</p>}
@@ -313,15 +353,18 @@ export default function SchedulePage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>일정</h2>
-        {isManagerOrAbove && !showCreateForm && (
-          <button
-            className={styles.createBtn}
-            onClick={() => { setShowCreateForm(true); setNewWeekDeadline(defaultDeadlineStr(nextWeekStart)); }}
-          >
-            + 주 생성
-          </button>
-        )}
+        {titleBtn}
+        <div className={styles.headerActions}>
+          {voteBtn}
+          {isManagerOrAbove && !showCreateForm && (
+            <button
+              className={styles.createBtn}
+              onClick={() => { setShowCreateForm(true); setNewWeekDeadline(defaultDeadlineStr(nextWeekStart)); }}
+            >
+              + 주 생성
+            </button>
+          )}
+        </div>
       </div>
 
       {tabBar}
