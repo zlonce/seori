@@ -64,6 +64,12 @@ public class ScheduleController {
         return ResponseEntity.ok(scheduleService.closeVoting(weekId));
     }
 
+    @PatchMapping("/{weekId}/reopen")
+    @PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
+    public ResponseEntity<ScheduleWeekResponseDto> reopenVoting(@PathVariable Long weekId) {
+        return ResponseEntity.ok(scheduleService.reopenVoting(weekId));
+    }
+
     @PutMapping("/{weekId}/confirm")
     @PreAuthorize("hasRole('OWNER') or hasRole('MANAGER')")
     public ResponseEntity<ScheduleWeekResponseDto> confirm(
