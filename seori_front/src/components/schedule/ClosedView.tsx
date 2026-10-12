@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { confirmScheduleAPI } from "../../api/schedule";
-import type { ScheduleWeekDetail } from "../../api/schedule";
+import { confirmScheduleAPI, reopenVotingAPI } from "../../api/schedule";
+import type { ScheduleWeek, ScheduleWeekDetail } from "../../api/schedule";
+import ConfirmModal from "../common/ConfirmModal";
 import { DAY_KO, formatShort } from "./scheduleUtils";
 import VoteTable from "./VoteTable";
 import styles from "./SchedulePage.module.css";
@@ -11,6 +12,7 @@ interface Props {
   myId: string;
   isManagerOrAbove: boolean;
   onRefreshDetail: () => Promise<void>;
+  onUpdateWeekInfo: (updated: ScheduleWeek) => void;
   onError: (msg: string) => void;
 }
 
@@ -20,9 +22,12 @@ export default function ClosedView({
   myId,
   isManagerOrAbove,
   onRefreshDetail,
+  onUpdateWeekInfo,
   onError,
 }: Props) {
   const [draftAssign, setDraftAssign] = useState<Set<string>>(new Set());
+  const [confirmingReopen, setConfirmingReopen] = useState(false);
+  const [confirmingSchedule, setConfirmingSchedule] = useState(false);
 
   const votesFor = (date: string) =>
     currentDetail.votes.filter((v) => v.availableDate === date);
@@ -38,6 +43,7 @@ export default function ClosedView({
   };
 
   const handleConfirm = async () => {
+    setConfirmingSchedule(false);
     const assignments = Array.from(draftAssign).map((key) => {
       const [userId, workDate] = key.split(":");
       return { userId, workDate };
@@ -47,6 +53,16 @@ export default function ClosedView({
       await onRefreshDetail();
     } catch {
       onError("일정 확정에 실패했습니다.");
+    }
+  };
+
+  const handleReopen = async () => {
+    setConfirmingReopen(false);
+    try {
+      const updated = await reopenVotingAPI(currentDetail.id);
+      onUpdateWeekInfo(updated);
+    } catch {
+      onError("투표 재개에 실패했습니다.");
     }
   };
 
@@ -97,9 +113,28 @@ export default function ClosedView({
               })}
             </div>
           </div>
-          <button className={styles.confirmBtn} onClick={handleConfirm}>
+          <button className={styles.confirmBtn} onClick={() => setConfirmingSchedule(true)}>
             일정 확정
           </button>
+          <button className={styles.reopenBtn} onClick={() => setConfirmingReopen(true)}>
+            투표 다시 열기
+          </button>
+          {confirmingSchedule && (
+            <ConfirmModal
+              message="일정을 확정하시겠어요?"
+              confirmLabel="확정"
+              onConfirm={handleConfirm}
+              onCancel={() => setConfirmingSchedule(false)}
+            />
+          )}
+          {confirmingReopen && (
+            <ConfirmModal
+              message="투표를 다시 여시겠어요?"
+              confirmLabel="다시 열기"
+              onConfirm={handleReopen}
+              onCancel={() => setConfirmingReopen(false)}
+            />
+          )}
         </>
       )}
     </>

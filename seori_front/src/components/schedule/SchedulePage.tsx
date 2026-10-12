@@ -460,6 +460,7 @@ export default function SchedulePage() {
           myId={myId}
           isManagerOrAbove={isManagerOrAbove}
           onRefreshDetail={() => refreshDetail(currentDetail.id)}
+          onUpdateWeekInfo={updateCachedWeekInfo}
           onError={showError}
         />
       )}
