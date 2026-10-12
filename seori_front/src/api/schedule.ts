@@ -44,6 +44,9 @@ export const updateBusinessDaysAPI = (weekId: number, businessDays: boolean[]) =
 export const closeVotingAPI = (weekId: number) =>
   client.patch<ScheduleWeek>(`/schedule/${weekId}/close`).then((r) => r.data);
 
+export const reopenVotingAPI = (weekId: number) =>
+  client.patch<ScheduleWeek>(`/schedule/${weekId}/reopen`).then((r) => r.data);
+
 export const confirmScheduleAPI = (
   weekId: number,
   assignments: { userId: string; workDate: string }[]
