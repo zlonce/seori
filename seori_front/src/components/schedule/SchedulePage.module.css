@@ -612,6 +612,23 @@
   background: var(--color-primary-hover);
 }
 
+.reopenBtn {
+  width: 100%;
+  padding: 13px;
+  background: none;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.reopenBtn:hover {
+  color: var(--color-text);
+}
+
 /* ── 투표 현황 토글 (CONFIRMED) ── */
 .voteHistoryToggle {
   width: 100%;
