@@ -2,6 +2,7 @@ package com.example.seori_back.global.config;
 
 import com.example.seori_back.global.jwt.JwtAuthenticationFilter;
 import com.example.seori_back.global.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -59,6 +60,10 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
+            .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint((request, response, e) ->
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
+            )
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST,
                             "/api/auth/login",

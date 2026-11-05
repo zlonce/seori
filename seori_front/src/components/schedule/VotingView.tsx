@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { closeVotingAPI, saveVotesAPI } from "../../api/schedule";
 import type { ScheduleWeek, ScheduleWeekDetail } from "../../api/schedule";
+import ConfirmModal from "../common/ConfirmModal";
 import { DAY_KO } from "./scheduleUtils";
 import VoteTable from "./VoteTable";
 import styles from "./SchedulePage.module.css";
@@ -36,6 +37,7 @@ export default function VotingView({
     [currentDetail, myId],
   );
 
+  const [confirmingClose, setConfirmingClose] = useState(false);
   const [draft, setDraft] = useState<Set<string> | null>(null);
   const localVoteSet = draft ?? serverVotes;
   const voteDirty = draft !== null;
@@ -61,6 +63,7 @@ export default function VotingView({
   };
 
   const handleCloseVoting = async () => {
+    setConfirmingClose(false);
     try {
       const updated = await closeVotingAPI(currentDetail.id);
       onUpdateWeekInfo(updated);
@@ -107,9 +110,18 @@ export default function VotingView({
       </div>
 
       {isManagerOrAbove && (
-        <button className={styles.closeBtn} onClick={handleCloseVoting}>
+        <button className={styles.closeBtn} onClick={() => setConfirmingClose(true)}>
           투표 마감
         </button>
+      )}
+
+      {confirmingClose && (
+        <ConfirmModal
+          message="투표를 마감하시겠어요?"
+          confirmLabel="마감"
+          onConfirm={handleCloseVoting}
+          onCancel={() => setConfirmingClose(false)}
+        />
       )}
     </>
   );

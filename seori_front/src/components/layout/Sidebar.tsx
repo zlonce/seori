@@ -59,13 +59,17 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <span>{item.label}</span>
             </button>
           ))}
+          <div className={styles.divider} />
+          <button
+            className={styles.passwordLink}
+            onClick={() => {
+              setShowPasswordModal(true);
+              onClose();
+            }}
+          >
+            비밀번호 변경
+          </button>
         </nav>
-        <button
-          className={styles.passwordLink}
-          onClick={() => setShowPasswordModal(true)}
-        >
-          비밀번호 변경
-        </button>
       </div>
       {showPasswordModal && (
         <PasswordChangeModal onClose={() => setShowPasswordModal(false)} />

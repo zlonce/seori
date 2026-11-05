@@ -60,6 +60,10 @@ public class ScheduleWeek {
         this.status = WeekStatusEnum.CLOSED;
     }
 
+    public void reopen() {
+        this.status = WeekStatusEnum.VOTING;
+    }
+
     public void confirm() {
         this.status = WeekStatusEnum.CONFIRMED;
     }

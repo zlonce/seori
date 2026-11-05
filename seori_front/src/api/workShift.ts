@@ -13,12 +13,6 @@ export interface WorkShiftResponse {
   totalWage: number;
 }
 
-export interface CreateWorkShiftRequest {
-  workDate: string;
-  startTime: string;
-  endTime: string;
-}
-
 export interface UpdateWorkShiftRequest {
   startTime: string;
   endTime: string;
@@ -29,9 +23,6 @@ export const getMyWorkShiftsAPI = (year: number, month: number) =>
 
 export const getStaffWorkShiftsAPI = (staffId: string, year: number, month: number) =>
   client.get<WorkShiftResponse[]>(`/work-shifts/staff/${staffId}`, { params: { year, month } }).then((r) => r.data);
-
-export const createWorkShiftAPI = (data: CreateWorkShiftRequest) =>
-  client.post<WorkShiftResponse>("/work-shifts", data).then((r) => r.data);
 
 export const updateWorkShiftAPI = (id: number, data: UpdateWorkShiftRequest) =>
   client.put<WorkShiftResponse>(`/work-shifts/${id}`, data).then((r) => r.data);

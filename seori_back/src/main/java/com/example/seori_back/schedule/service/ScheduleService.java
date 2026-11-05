@@ -85,6 +85,16 @@ public class ScheduleService {
     }
 
     @Transactional
+    public ScheduleWeekResponseDto reopenVoting(Long weekId) {
+        ScheduleWeek week = findWeek(weekId);
+        if (week.getStatus() != WeekStatusEnum.CLOSED) {
+            throw new CustomException(ErrorCode.SCHEDULE_INVALID_STATUS);
+        }
+        week.reopen();
+        return ScheduleWeekResponseDto.from(week);
+    }
+
+    @Transactional
     public ScheduleWeekResponseDto confirm(Long weekId, AssignmentsRequestDto request) {
         ScheduleWeek week = findWeek(weekId);
         if (week.getStatus() != WeekStatusEnum.CLOSED) {
