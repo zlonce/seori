@@ -20,7 +20,5 @@ public interface WorkShiftRepository extends JpaRepository<WorkShift, Long> {
     @Query("SELECT w FROM WorkShift w WHERE w.user.userId IN :userIds AND w.workDate IN :workDates")
     List<WorkShift> findByUserIdInAndWorkDateIn(@Param("userIds") List<String> userIds, @Param("workDates") List<LocalDate> workDates);
 
-    List<WorkShift> findByWorkDateBetween(LocalDate start, LocalDate end);
-
     List<WorkShift> findByWeekId(Long weekId);
 }
