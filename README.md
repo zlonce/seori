@@ -22,7 +22,7 @@
 ## 기술 스택
 
 - **Frontend**: React, TypeScript, Vite
-- **Backend**: Spring Boot, Java 17, Spring Security, JPA, JWT
+- **Backend**: Spring Boot, Java 21, Spring Security, JPA, JWT
 - **Database**: MySQL
 - **Infra**: Docker Compose, Caddy, GitHub Actions, Oracle Cloud
 
