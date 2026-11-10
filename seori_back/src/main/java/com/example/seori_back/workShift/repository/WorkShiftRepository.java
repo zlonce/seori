@@ -1,6 +1,8 @@
 package com.example.seori_back.workShift.repository;
 
 import com.example.seori_back.workShift.domain.entity.WorkShift;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,5 +22,6 @@ public interface WorkShiftRepository extends JpaRepository<WorkShift, Long> {
     @Query("SELECT w FROM WorkShift w WHERE w.user.userId IN :userIds AND w.workDate IN :workDates")
     List<WorkShift> findByUserIdInAndWorkDateIn(@Param("userIds") List<String> userIds, @Param("workDates") List<LocalDate> workDates);
 
+    @EntityGraph(attributePaths = "user")
     List<WorkShift> findByWeekId(Long weekId);
 }
