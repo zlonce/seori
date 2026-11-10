@@ -193,8 +193,7 @@ export default function SchedulePage() {
     try {
       const newIdx = weeks.length;
       const created = await createWeekAPI(nextWeekStart, newWeekDays, newWeekDeadline);
-      const detail = await getWeekDetailAPI(created.id);
-      cacheRef.current.set(created.id, detail);
+      cacheRef.current.set(created.id, { ...created, votes: [], assignments: [] });
       setWeeks((prev) => [...prev, created]);
       setWeekIdx(newIdx);
       setShowCreateForm(false);
