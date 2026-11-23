@@ -2,7 +2,8 @@ import { DAY_KO, formatWeekRange } from "./scheduleUtils";
 import styles from "./SchedulePage.module.css";
 
 interface Props {
-  nextWeekStart: string;
+  weekStart: string;
+  onWeekStartChange: (value: string) => void;
   newWeekDays: boolean[];
   setNewWeekDays: React.Dispatch<React.SetStateAction<boolean[]>>;
   votingDeadline: string;
@@ -12,7 +13,8 @@ interface Props {
 }
 
 export default function CreateWeekForm({
-  nextWeekStart,
+  weekStart,
+  onWeekStartChange,
   newWeekDays,
   setNewWeekDays,
   votingDeadline,
@@ -24,8 +26,15 @@ export default function CreateWeekForm({
     <div className={styles.createForm}>
       <div className={styles.createFormHeader}>
         <span className={styles.createFormLabel}>새 투표 주간</span>
-        <span className={styles.createFormWeek}>{formatWeekRange(nextWeekStart)}</span>
+        <span className={styles.createFormWeek}>{formatWeekRange(weekStart)}</span>
       </div>
+      <p className={styles.createFormHint}>시작일 (선택한 날짜가 속한 주 월요일로 맞춰집니다)</p>
+      <input
+        type="date"
+        className={styles.deadlineInput}
+        value={weekStart}
+        onChange={(e) => onWeekStartChange(e.target.value)}
+      />
       <p className={styles.createFormHint}>영업일 선택 (화요일 기본 휴무)</p>
       <div className={styles.dayToggleGrid}>
         {DAY_KO.map((day, i) => (

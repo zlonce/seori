@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
 
-    @Value("${front.url:http://localhost:5173}")
+    @Value("${front.url:http://localhost:5174}")
     private String frontUrl;
 
     @Bean
