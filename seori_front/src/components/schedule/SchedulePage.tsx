@@ -212,7 +212,7 @@ export default function SchedulePage() {
   useEffect(() => {
     if (!week) return;
     setEditingDays(false);
-    setShowCreateForm(false);
+    resetCreateForm();
     loadWeekDetail(week.id);
   }, [week?.id]);
 
