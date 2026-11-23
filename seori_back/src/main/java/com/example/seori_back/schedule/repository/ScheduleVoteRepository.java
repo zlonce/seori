@@ -1,6 +1,8 @@
 package com.example.seori_back.schedule.repository;
 
 import com.example.seori_back.schedule.domain.entity.ScheduleVote;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ScheduleVoteRepository extends JpaRepository<ScheduleVote, Long> {
+
+    @EntityGraph(attributePaths = "user")
     List<ScheduleVote> findByWeekId(Long weekId);
 
     @Modifying

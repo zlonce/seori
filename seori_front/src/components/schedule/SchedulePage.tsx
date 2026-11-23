@@ -101,6 +101,7 @@ export default function SchedulePage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newWeekDays, setNewWeekDays] = useState<boolean[]>([...DEFAULT_BUSINESS_DAYS]);
   const [newWeekDeadline, setNewWeekDeadline] = useState("");
+  const [customWeekStart, setCustomWeekStart] = useState("");
   const [editingDays, setEditingDays] = useState(false);
   const [draftDays, setDraftDays] = useState<boolean[]>([]);
 
@@ -121,6 +122,25 @@ export default function SchedulePage() {
     d.setDate(d.getDate() + 7);
     return toLocalStr(d);
   })();
+
+  const weekStart = customWeekStart || nextWeekStart;
+
+  // 선택한 날짜가 속한 주의 월요일로 보정
+  const handleWeekStartChange = (value: string) => {
+    if (!value) { setCustomWeekStart(""); setNewWeekDeadline(defaultDeadlineStr(nextWeekStart)); return; }
+    const d = new Date(value + "T00:00:00");
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const monday = toLocalStr(d);
+    setCustomWeekStart(monday);
+    setNewWeekDeadline(defaultDeadlineStr(monday));
+  };
+
+  const resetCreateForm = () => {
+    setShowCreateForm(false);
+    setNewWeekDays([...DEFAULT_BUSINESS_DAYS]);
+    setNewWeekDeadline("");
+    setCustomWeekStart("");
+  };
 
   const showError = (msg: string) => {
     setErrorMsg(msg);
@@ -192,21 +212,22 @@ export default function SchedulePage() {
   useEffect(() => {
     if (!week) return;
     setEditingDays(false);
-    setShowCreateForm(false);
+    resetCreateForm();
     loadWeekDetail(week.id);
   }, [week?.id]);
 
   const handleSubmitCreate = async () => {
+    if (weeks.some((w) => w.weekStartDate === weekStart)) {
+      showError("이미 생성된 주차입니다.");
+      return;
+    }
     try {
-      const newIdx = weeks.length;
-      const created = await createWeekAPI(nextWeekStart, newWeekDays, newWeekDeadline);
-      const detail = await getWeekDetailAPI(created.id);
-      cacheRef.current.set(created.id, detail);
-      setWeeks((prev) => [...prev, created]);
-      setWeekIdx(newIdx);
-      setShowCreateForm(false);
-      setNewWeekDays([...DEFAULT_BUSINESS_DAYS]);
-      setNewWeekDeadline("");
+      const created = await createWeekAPI(weekStart, newWeekDays, newWeekDeadline);
+      cacheRef.current.set(created.id, { ...created, votes: [], assignments: [] });
+      const sorted = [...weeks, created].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
+      setWeeks(sorted);
+      setWeekIdx(sorted.findIndex((w) => w.id === created.id));
+      resetCreateForm();
     } catch {
       showError("주차 생성에 실패했습니다.");
     }
@@ -335,13 +356,14 @@ export default function SchedulePage() {
         {tabBar}
         {showCreateForm && (
           <CreateWeekForm
-            nextWeekStart={nextWeekStart}
+            weekStart={weekStart}
+            onWeekStartChange={handleWeekStartChange}
             newWeekDays={newWeekDays}
             setNewWeekDays={setNewWeekDays}
             votingDeadline={newWeekDeadline}
             setVotingDeadline={setNewWeekDeadline}
             onSubmit={handleSubmitCreate}
-            onCancel={() => { setShowCreateForm(false); setNewWeekDays([...DEFAULT_BUSINESS_DAYS]); setNewWeekDeadline(""); }}
+            onCancel={resetCreateForm}
           />
         )}
         {errorMsg && <p className={styles.waitMsg}>{errorMsg}</p>}
@@ -373,13 +395,14 @@ export default function SchedulePage() {
 
       {showCreateForm && (
         <CreateWeekForm
-          nextWeekStart={nextWeekStart}
+          weekStart={weekStart}
+          onWeekStartChange={handleWeekStartChange}
           newWeekDays={newWeekDays}
           setNewWeekDays={setNewWeekDays}
           votingDeadline={newWeekDeadline}
           setVotingDeadline={setNewWeekDeadline}
           onSubmit={handleSubmitCreate}
-          onCancel={() => { setShowCreateForm(false); setNewWeekDays([...DEFAULT_BUSINESS_DAYS]); setNewWeekDeadline(""); }}
+          onCancel={resetCreateForm}
         />
       )}
 

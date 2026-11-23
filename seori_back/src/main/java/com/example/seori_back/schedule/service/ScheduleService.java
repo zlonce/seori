@@ -59,6 +59,9 @@ public class ScheduleService {
 
     @Transactional
     public ScheduleWeekResponseDto createWeek(CreateScheduleWeekRequestDto request) {
+        if (scheduleWeekRepository.existsByWeekStartDate(request.weekStartDate())) {
+            throw new CustomException(ErrorCode.SCHEDULE_WEEK_ALREADY_EXISTS);
+        }
         ScheduleWeek week = ScheduleWeek.create(request.weekStartDate(), request.votingDeadline(), request.businessDays());
         scheduleWeekRepository.save(week);
         return ScheduleWeekResponseDto.from(week);

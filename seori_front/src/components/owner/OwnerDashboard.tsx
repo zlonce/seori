@@ -9,7 +9,7 @@ import styles from "./OwnerDashboard.module.css";
 type Tab = "staff" | "wage" | "specialDays";
 
 export default function OwnerDashboard() {
-  const [tab, setTab] = useState<Tab>("staff");
+  const [tab, setTab] = useState<Tab>("wage");
   const [staffList, setStaffList] = useState<Staff[]>([]);
 
   const fetchStaff = () =>
